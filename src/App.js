@@ -30,7 +30,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">
-				{this.state.statesList && <RegionTable list={this.state.statesList}/>}
+				{this.state.statesList && <RegionTable title="State" list={this.state.statesList}/>}
 			</div>
 		);
 	}

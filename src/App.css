@@ -13,22 +13,6 @@
   }
 }
 
-.xxxtr {
-  height: 10px;
-  height: auto !important;
-}
-
-.xxxtd {
-   height: auto !important;
-}
-
-.regiontable {
-    height: "500px";
-    width: "150px";
-    maxHeight: "500px";
-    backgroundColor: "#fffff0";
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -42,15 +26,6 @@
 
 .App-link {
   color: #61dafb;
-}
-
-.myList {
-  width: 500px;
-}
-
-.myTableRow {
-  height: 4px;
-  color: red;
 }
 
 @keyframes App-logo-spin {

@@ -25,46 +25,41 @@ class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {selection: null};
-	    this.handleClick = this.handleClick.bind(this);		
+	    this.handleCellClick = this.handleCellClick.bind(this);		
 	    this.select = this.select.bind(this);		
-	    this.nextStateClick = this.nextStateClick.bind(this);		
-	    this.prevStateClick = this.prevStateClick.bind(this);		
-	    // this.handleScroll = this.handleScroll.bind(this);	
+	    this.handleNextClick = this.handleNextClick.bind(this);		
+	    this.handlePrevClick = this.handlePrevClick.bind(this);		
 	    this.selectedRef = React.createRef();
 	    this.tableContainerRef = React.createRef();
-	    this.selectedStateIndex = -1;
+	    this.selectedIndex = -1;
 	}
 
 	select(name) {
 		this.setState({selection: name});
 		for (var i = 0; i < this.props.list.length; i += 1) {
 			if (this.props.list[i].name === name) {
-				this.selectedStateIndex = i;
+				this.selectedIndex = i;
 				return;
 			}
 		}	
 	}
 
-	handleKey(e) {
-		alert(e);
-	}
-
-	handleClick(e, name) {
+	handleCellClick(e, name) {
 		this.select(name);
 	}
 
-	nextStateClick(e) {
-		if (this.selectedStateIndex < this.props.list.length - 1) {
-			this.selectedStateIndex += 1;
+	handleNextClick(e) {
+		if (this.selectedIndex < this.props.list.length - 1) {
+			this.selectedIndex += 1;
 		}
-		this.select(this.props.list[this.selectedStateIndex].name);	
+		this.select(this.props.list[this.selectedIndex].name);	
 	}
 
-	prevStateClick(e) {
-		if (this.selectedStateIndex > 0) {
-			this.selectedStateIndex -= 1;
+	handlePrevClick(e) {
+		if (this.selectedIndex > 0) {
+			this.selectedIndex -= 1;
 		}
-		this.select(this.props.list[this.selectedStateIndex].name);	
+		this.select(this.props.list[this.selectedIndex].name);	
 	}
 
 	// handleScroll(msg, e) {
@@ -92,12 +87,12 @@ class RegionTable extends React.Component {
 
 	render() {
 		return (<div>
-			<TableContainer ref={this.tableContainerRef} onKeyDown={this.handleKey} style={regionTableStyle}>
+			<TableContainer ref={this.tableContainerRef} style={regionTableStyle}>
 				{/* onRowClicked={this.handleRowSelected} */}
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
             			<TableRow style={slimStyle}>
-              				<TableCell style={slimStyle} align="left">State</TableCell>
+              				<TableCell style={slimStyle} align="left">{this.props.title}</TableCell>
               				<TableCell style={slimStyle} align="right">Cases</TableCell>
             			</TableRow>            
      				</TableHead>
@@ -107,16 +102,16 @@ class RegionTable extends React.Component {
 	  						var selected = item.name === this.state.selection;
 
 					  		return <TableRow ref={selected ? this.selectedRef : null} selected={selected} style={slimStyle} key={item.name} onClick={this.props.itemClick}>
-								<TableCell style={slimStyle} align="left" onClick={(e) => this.handleClick(e, item.name)}>{item.name}</TableCell>
-								<TableCell style={slimStyle} align="right" onClick={(e) => this.handleClick(e, item.name)}>{item.cases}</TableCell>
+								<TableCell style={slimStyle} align="left" onClick={(e) => this.handleCellClick(e, item.name)}>{item.name}</TableCell>
+								<TableCell style={slimStyle} align="right" onClick={(e) => this.handleCellClick(e, item.name)}>{item.cases}</TableCell>
 				  			</TableRow>
 					    })}
 					</TableBody>
 				</Table>
 			</TableContainer>
 			<div style={buttonsStyle}>
-				<Button onClick={this.prevStateClick}>◀</Button>
-				<Button onClick={this.nextStateClick}>▶</Button>
+				<Button onClick={this.handlePrevClick}>◀</Button>
+				<Button onClick={this.handleNextClick}>▶</Button>
 			</div>
 		</div>);
 	}
