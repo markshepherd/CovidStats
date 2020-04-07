@@ -1,18 +1,19 @@
 import React from 'react';
 import RegionTable from './RegionTable';
+import SeriesChart from './SeriesChart';
 import CovidData from './CovidData';
 import './App.css';
 
 class App extends React.Component {
-
 	/* this.state = 
 		{
 			nationalSeries,
 			statesData,
-			selectedState
+			selectedState,
+			selectedCounty
 	 	}
 	*/
-	
+
 	constructor(props) {
 		super(props);
 		this.state = {};
@@ -57,7 +58,7 @@ class App extends React.Component {
 	}
 
 	countySelected(countyName) {
-		console.log(countyName);
+		this.setState({selectedCounty: countyName});
 	}
 
 	stateStyle = {
@@ -72,11 +73,22 @@ class App extends React.Component {
 	    left: "200px"
 	};
 
+	chartStyle = {
+	    position: "absolute",
+	    top: "10px",
+	    left: "400px",
+	    height: "1200px",
+	    width: "1200px",
+	};
+
 	render() {
 		return (
 			<div className="App">
 				{this.state.statesList && <div style={this.stateStyle}><RegionTable backgroundColor="#ffffe0" title="State" list={this.state.statesList} selected={this.stateSelected}/></div>}
 				{this.state.selectedState && <div style={this.countyStyle}><RegionTable backgroundColor="#fffff4" title="County" list={this.calcCountiesList(this.state.statesData, this.state.selectedState)} selected={this.countySelected}/></div>}
+				{this.state.selectedCounty && <div style={this.chartStyle}>
+					<SeriesChart series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/>
+				</div>}
 			</div>
 		);
 	}

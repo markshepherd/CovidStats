@@ -24,20 +24,47 @@ class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
 		this.style = Object.assign({backgroundColor: props.backgroundColor}, regionTableStyle);
-		this.state = {selection: null};
+		this.state = {selection: null, list: props.list};
 	    this.handleCellClick = this.handleCellClick.bind(this);		
 	    this.select = this.select.bind(this);		
 	    this.handleNextClick = this.handleNextClick.bind(this);		
 	    this.handlePrevClick = this.handlePrevClick.bind(this);		
+	    this.sortByName = this.sortByName.bind(this);		
+	    this.sortByCases = this.sortByCases.bind(this);
+	    this.sortBy = "cases";	
 	    this.selectedRef = React.createRef();
 	    this.tableContainerRef = React.createRef();
 	    this.selectedIndex = -1;
 	}
 
+	sortArray(array, property, numeric, ascending) {
+		var newArray = [];
+		for (var i = 0; i < array.length; i += 1) {
+			newArray.push(Object.assign({}, array[i]));
+		}
+
+		if (!numeric) {
+			newArray.sort(function(a, b) {
+				if (a[property] < b[property]) {
+					return ascending ? -1 : 1;
+				} else if (a[property] > b[property]) {
+					return ascending ? 1 : -1;
+				} else {
+					return 0;
+				}
+			});
+		} else {
+			newArray.sort(function(a, b) {
+				return ascending ? a[property] - b[property] : b[property] - a[property];
+			});
+		}
+		return newArray;
+	}
+
 	select(name) {
 		this.setState({selection: name});
-		for (var i = 0; i < this.props.list.length; i += 1) {
-			if (this.props.list[i].name === name) {
+		for (var i = 0; i < this.state.list.length; i += 1) {
+			if (this.state.list[i].name === name) {
 				this.selectedIndex = i;
 				break;
 			}
@@ -50,20 +77,38 @@ class RegionTable extends React.Component {
 	}
 
 	handleNextClick(e) {
-		if (this.selectedIndex < this.props.list.length - 1) {
+		if (this.selectedIndex < this.state.list.length - 1) {
 			this.selectedIndex += 1;
 		}
-		this.select(this.props.list[this.selectedIndex].name);	
+		this.select(this.state.list[this.selectedIndex].name);	
 	}
 
 	handlePrevClick(e) {
 		if (this.selectedIndex > 0) {
 			this.selectedIndex -= 1;
 		}
-		this.select(this.props.list[this.selectedIndex].name);	
+		this.select(this.state.list[this.selectedIndex].name);	
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	sortByName() {
+		this.setState({sortBy: "name"});
+	}
+
+	sortByCases() {
+		this.setState({sortBy: "cases"});
+	}
+
+	createSortedList() {
+		var list;
+		if (this.state.sortBy === "cases") {
+			list = this.sortArray(this.props.list, "cases", true, false);
+		} else {
+			list = this.sortArray(this.props.list, "name", false, true);
+		}
+		this.setState({list: list});
+	}
+
+	ensureSelectionVisible() {
 		const container = this.tableContainerRef.current;
 		const row = this.selectedRef.current;
 		if (!row) return;
@@ -79,6 +124,13 @@ class RegionTable extends React.Component {
 		}
 	}
 
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		this.ensureSelectionVisible();
+		if (prevState.sortBy != this.state.sortBy || prevProps.list !== this.props.list) {
+			this.createSortedList();
+		}
+	}
+
 	render() {
 		return (<div>
 			<div style={buttonsStyle}>
@@ -90,13 +142,13 @@ class RegionTable extends React.Component {
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
             			<TableRow style={slimStyle}>
-              				<TableCell style={slimStyle} align="left">{this.props.title}</TableCell>
-              				<TableCell style={slimStyle} align="right">Cases</TableCell>
+              				<TableCell style={slimStyle} onClick={this.sortByName} align="left">{this.props.title}</TableCell>
+              				<TableCell style={slimStyle} onClick={this.sortByCases} align="right">Cases</TableCell>
             			</TableRow>            
      				</TableHead>
 
 					<TableBody>
-	  					{this.props.list.map((item) => {
+	  					{this.state.list.map((item) => {
 	  						var selected = item.name === this.state.selection;
 
 					  		return <TableRow ref={selected ? this.selectedRef : null} selected={selected} style={slimStyle} key={item.name} onClick={this.props.itemClick}>
