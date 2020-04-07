@@ -18,12 +18,12 @@ const regionTableStyle = {
     height: "500px",
     width: "150px",
     maxHeight: "500px",
-    backgroundColor: "#fffff0"
 };
 
 class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
+		this.style = Object.assign({backgroundColor: props.backgroundColor}, regionTableStyle);
 		this.state = {selection: null};
 	    this.handleCellClick = this.handleCellClick.bind(this);		
 	    this.select = this.select.bind(this);		
@@ -39,9 +39,10 @@ class RegionTable extends React.Component {
 		for (var i = 0; i < this.props.list.length; i += 1) {
 			if (this.props.list[i].name === name) {
 				this.selectedIndex = i;
-				return;
+				break;
 			}
-		}	
+		}
+		this.props.selected(name);
 	}
 
 	handleCellClick(e, name) {
@@ -62,17 +63,10 @@ class RegionTable extends React.Component {
 		this.select(this.props.list[this.selectedIndex].name);	
 	}
 
-	// handleScroll(msg, e) {
-	// 	//console.log(msg, e);
-	// }
-
-	// handleRowSelected(e) {
-	// 	//console.log("handleRowSelected", e);
-	// }
-
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const container = this.tableContainerRef.current;
 		const row = this.selectedRef.current;
+		if (!row) return;
 		const containerVisibleHeight = container.scrollHeight - container.scrollTopMax;
 		const rowBottom = row.offsetTop + row.offsetHeight;
 		if (rowBottom < (container.scrollTop + containerVisibleHeight) && (row.offsetTop - row.offsetHeight) > container.scrollTop) {
@@ -87,7 +81,11 @@ class RegionTable extends React.Component {
 
 	render() {
 		return (<div>
-			<TableContainer ref={this.tableContainerRef} style={regionTableStyle}>
+			<div style={buttonsStyle}>
+				<Button onClick={this.handlePrevClick}>◀</Button>
+				<Button onClick={this.handleNextClick}>▶</Button>
+			</div>
+			<TableContainer ref={this.tableContainerRef} style={this.style}>
 				{/* onRowClicked={this.handleRowSelected} */}
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
@@ -109,10 +107,6 @@ class RegionTable extends React.Component {
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<div style={buttonsStyle}>
-				<Button onClick={this.handlePrevClick}>◀</Button>
-				<Button onClick={this.handleNextClick}>▶</Button>
-			</div>
 		</div>);
 	}
 }

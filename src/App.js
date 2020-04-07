@@ -4,9 +4,22 @@ import CovidData from './CovidData';
 import './App.css';
 
 class App extends React.Component {
+
+	/* this.state = 
+		{
+			nationalSeries,
+			statesData,
+			selectedState
+	 	}
+	*/
+	
 	constructor(props) {
 		super(props);
 		this.state = {};
+		this.calcStatesList = this.calcStatesList.bind(this);		
+		this.calcCountiesList = this.calcCountiesList.bind(this);		
+		this.stateSelected = this.stateSelected.bind(this);		
+		this.countySelected = this.countySelected.bind(this);		
 	}
 
 	calcStatesList(statesData) {
@@ -20,6 +33,18 @@ class App extends React.Component {
 		return result;
 	}
 
+	calcCountiesList(statesData, stateName) {
+		const stateData = statesData[stateName];
+		const result = [];
+		const keys = Object.keys(stateData.countiesData).sort();
+		for (var i = 0; i < keys.length; i += 1) {
+			const countyName = keys[i];
+			const countyData = stateData.countiesData[countyName];
+			result.push({name: countyName, cases: countyData.cases});
+		}
+		return result;
+	}
+
 	componentDidMount() {
 		this.covidData = new CovidData((data) => {
 			data.statesList = this.calcStatesList(data.statesData);
@@ -27,10 +52,31 @@ class App extends React.Component {
 		});
 	}
 
+	stateSelected(stateName) {
+		this.setState({selectedState: stateName});
+	}
+
+	countySelected(countyName) {
+		console.log(countyName);
+	}
+
+	stateStyle = {
+	    position: "absolute",
+	    top: "10px",
+	    left: "20px"
+	};
+
+	countyStyle = {
+	    position: "absolute",
+	    top: "10px",
+	    left: "200px"
+	};
+
 	render() {
 		return (
 			<div className="App">
-				{this.state.statesList && <RegionTable title="State" list={this.state.statesList}/>}
+				{this.state.statesList && <div style={this.stateStyle}><RegionTable backgroundColor="#ffffe0" title="State" list={this.state.statesList} selected={this.stateSelected}/></div>}
+				{this.state.selectedState && <div style={this.countyStyle}><RegionTable backgroundColor="#fffff4" title="County" list={this.calcCountiesList(this.state.statesData, this.state.selectedState)} selected={this.countySelected}/></div>}
 			</div>
 		);
 	}
