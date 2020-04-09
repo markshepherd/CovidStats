@@ -1,56 +1,41 @@
 export default class CovidData {
 
-	stateNames = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
-	"Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine",
-	"Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada",
-	"New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma",
-	"Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont",
-	"Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
-
-	// Series = {
-	// 	timeline: [{date: ..., cases: ..., deaths: ...}, ...]
-	// 	cases: nnn
-	// 	deaths: nnn
-	// }
-
-	nationalSeries = {timeline: [], cases: 0, deaths: 0};
-	// Series
-
-	statesData = {};
+	// This class reads a covid states/counties data file, and parses
+	// the file into a data structure like this:
+	//
 	// {
 	// 	Alabama: {
-	// 		series: Series,
-	// 		countyNames: ["Alameda", ...]
 	// 		countiesData: {
+	//	 		" All counties": Series,
 	// 			Alameda: Series,
 	// 			Marin: Series,
 	// 			...
-	// 		}
+	// 		},
 	// 	},
+	//  Alaska ...,
 	//  ...
+	//  " All states": { ... }
 	// }
+	//
+	// "Series" is like this 
+	// {
+	// 		timeline: [{date: ..., cases: ..., deaths: ...}, ...]
+	// 		cases: nnn
+	// 		deaths: nnn
+	// }
+	//
+	// Once the data is available, we call the "callback" function 
+	// with the data structure as the parameter.
 
-	sortArrayBy(array, property, numeric, ascending) {
-		if (!numeric) {
-			array.sort(function(a, b) {
-				if (a[property] < b[property]) {
-					return ascending ? -1 : 1;
-				} else if (a[property] > b[property]) {
-					return ascending ? 1 : -1;
-				} else {
-					return 0;
-				}
-			});
-		} else {
-			array.sort(function(a, b) {
-				return ascending ? a[property] - b[property] : b[property] - a[property];
-			});
-		}
+	static allCounties = " All counties"; // the leading space makes it sort first.
+	static allStates = " All states";
+
+	constructor(filepath, callback) {
+		this.callback = callback;
+		this.readBigDataFile(filepath);
 	}
 
-	// 	sortArrayBy(stateMenuModel, sortBy, sortBy != "name", sortBy == "name");
-
-	addToSeries(series, item) {
+	/*private*/ addToSeries(series, item) {
 		series.deaths += item.deaths;
 		series.cases += item.cases;
 		var timelineItem = series.timeline[item.date];
@@ -63,7 +48,7 @@ export default class CovidData {
 		}
 	}
 
-	optimizeSeries(series) {
+	/*private*/ optimizeSeries(series) {
 		var dates = Object.keys(series.timeline).sort();
 		var newTimeline = [];
 		for (var i = 0; i < dates.length; i += 1) {
@@ -72,20 +57,36 @@ export default class CovidData {
 		series.timeline = newTimeline;
 	}
 
-	receivedBigDataFile(text) {
-		// alert("got it" + text.substring(0, 25));
-		// date,county,state,fips,cases,deaths
-
+	// csv columns are: date,county,state,fips,cases,deaths
+	/*private*/ receivedBigDataFile(csvText) {
 		var previousCases;
 		var previousDeaths;
 		var previousCounty;
 		var previousState;
 		var stateData;
-
-		var lines = text.split(/[\n\r]+/);
+		var nationalSeries = {timeline: [], cases: 0, deaths: 0};
+		var statesData = {};
+		var tokens;
+		var lines = csvText.split(/[\n\r]+/);
+		var linesArray = [];
 		for (var i = 0; i < lines.length; i += 1) {
-			var tokens = lines[i].split(/,/);
+			tokens = lines[i].split(/,/);
 			if (tokens.length !== 6) continue;
+			if (tokens[0] === "date") continue;
+			linesArray.push(tokens);
+		}
+		linesArray.sort((a, b) => {
+			if (a[2] > b[2]) return 1;
+			if (a[2] < b[2]) return -1;
+			if (a[1] > b[1]) return 1;
+			if (a[1] < b[1]) return -1;
+			if (a[0] > b[0]) return 1;
+			if (a[0] < b[0]) return -1;
+			return 0;
+		});
+
+		for (var j = 0; j < linesArray.length; j += 1) {
+			tokens = linesArray[j];
 			const date = tokens[0];
 			const countyName = tokens[1];
 			const stateName = tokens[2];
@@ -108,12 +109,12 @@ export default class CovidData {
 
 			var newItem = {date: date, cases: cases, deaths: deaths};
 
-			this.addToSeries(this.nationalSeries, newItem);
+			this.addToSeries(nationalSeries, newItem);
 
-			stateData = this.statesData[stateName];
+			stateData = statesData[stateName];
 			if (!stateData) {
-				stateData = {series: {timeline: [], cases: 0, deaths: 0}, countyNames: [], countiesData: {}};
-				this.statesData[stateName] = stateData;
+				stateData = {series: {timeline: [], cases: 0, deaths: 0}, countiesData: {}};
+				statesData[stateName] = stateData;
 			}
 			this.addToSeries(stateData.series, newItem);
 
@@ -125,19 +126,20 @@ export default class CovidData {
 			this.addToSeries(countySeries, newItem);
 		}
 
-		this.optimizeSeries(this.nationalSeries);
-		for (var stateName in this.statesData) {
-			stateData = this.statesData[stateName];
-			this.optimizeSeries(stateData.series);
-			stateData.countyNames = Object.keys(stateData.countiesData).sort();
+		for (var stateName in statesData) {
+			stateData = statesData[stateName];
+			stateData.countiesData[CovidData.allCounties] = stateData.series;
+			delete stateData.series;
 			for (var b in stateData.countiesData) {
 				this.optimizeSeries(stateData.countiesData[b]);
 			}
 		}
-		this.callback({nationalSeries: this.nationalSeries, statesData: this.statesData});
+		this.optimizeSeries(nationalSeries);
+		statesData[CovidData.allStates] = {countiesData: {[CovidData.allCounties]: nationalSeries}};
+		this.callback({statesData: statesData});
 	}
 
-	readBigDataFile() {
+	/*private*/ readBigDataFile(filepath) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = () => {
 			if(xhr.readyState === XMLHttpRequest.DONE) {
@@ -150,12 +152,7 @@ export default class CovidData {
 				}
 			}
 		};
-		xhr.open("GET", "build/us-counties-4-4-sorted.csv");
+		xhr.open("GET", filepath);
 		xhr.send();
-	}
-
-	constructor(callback) {
-		this.callback = callback;
-		this.readBigDataFile();
 	}
 }
