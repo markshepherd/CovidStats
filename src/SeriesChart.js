@@ -3,7 +3,8 @@ import {Line} from 'react-chartjs-2';
 import './App.css';
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 
-const buttonsStyle = {position: "absolute", left: "5px", top: "5px"};
+const buttonsStyle = {position: "absolute", left: "10px", top: "5px"};
+const containerStyle = {position: "relative", top: "0px"};
 const radioStyle = {height: "25px"};
 
 class SeriesChart extends React.Component {
@@ -94,14 +95,14 @@ class SeriesChart extends React.Component {
 			}
 		};
 
-		return (<div style={this.props.style}>
-			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
+		return (<div style={containerStyle}>
 			<div style={buttonsStyle}>
 		        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
-		          <FormControlLabel control={<Radio color=""/>} size="small" style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
-		          <FormControlLabel control={<Radio color=""/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
+		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
+		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
 		        </RadioGroup>
 			</div>
+			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
 		</div>);
 	}
 }	
