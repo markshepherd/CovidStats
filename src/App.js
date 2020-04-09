@@ -47,7 +47,7 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.covidData = new CovidData("build/us-counties-4-7-20.csv", (data) => {
+		this.covidData = new CovidData("us-counties-4-7-20.csv", (data) => {
 			data.statesList = this.calcStatesList(data.statesData);
 			this.setState(data);
 		});
@@ -82,20 +82,12 @@ class App extends React.Component {
 	    backgroundColor: "#ffffff"
 	};
 
-	nytStyle = {
+	notesStyle = {
 	    position: "absolute",
 	    top: "570px",
 	    left: "20px",
 		fontSize: "10px",
-		textAlign: "right"
-	}
-
-	larkdalesStyle = {
-	    position: "absolute",
-	    top: "600px",
-	    left: "20px",
-		fontSize: "10px",
-		textAlign: "right"
+		textAlign: "left"
 	}
 
 	render() {
@@ -115,11 +107,12 @@ class App extends React.Component {
 					<SeriesChart style={this.chartStyle}
 						title={title}
 						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/></div>}
-				<div style={this.nytStyle}>
+				<div style={this.notesStyle}>
+					Page by <Link target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</Link>.
+					<br/>
 					Thanks to the<Link target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times </Link>
 					for the data. Last updated Apr 7, 2020.
-				</div>
-				<div style={this.larkdalesStyle}>
+					<br/>
 					Like country, bluegrass, gospel, or sea chanties? Try
 					<Link target="_blank" href="https://larkdales.com/"> The Larkdales</Link>.
 				</div>

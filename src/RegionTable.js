@@ -160,8 +160,8 @@ export default class RegionTable extends React.Component {
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
             			<TableRow style={slimStyle}>
-              				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}</TableCell>
-              				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">Cases</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}{this.state.sortBy === "name" ? "▲" : ""}</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">{this.state.sortBy === "cases" ? "▼" : ""}Cases</TableCell>
             			</TableRow>            
      				</TableHead>
 

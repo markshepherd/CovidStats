@@ -19,7 +19,7 @@ export default class CovidData {
 	//
 	// "Series" is like this 
 	// {
-	// 		timeline: [{date: ..., cases: ..., deaths: ...}, ...]
+	// 		timeline: [{date: ..., cases: ..., deaths: ..., totalCases: ..., totalDeaths: ...}, ...]
 	// 		cases: nnn
 	// 		deaths: nnn
 	// }
@@ -40,11 +40,14 @@ export default class CovidData {
 		series.cases += item.cases;
 		var timelineItem = series.timeline[item.date];
 		if (!timelineItem) {
-			timelineItem = {date: item.date, cases: item.cases, deaths: item.deaths};
+			timelineItem = {date: item.date, cases: item.cases, deaths: item.deaths,
+				cumulativeCases: item.cumulativeCases, cumulativeDeaths: item.cumulativeDeaths};
 			series.timeline[item.date] = timelineItem;
 		} else {
 			timelineItem.deaths += item.deaths;
 			timelineItem.cases += item.cases;
+			timelineItem.cumulativeCases += item.cumulativeCases;
+			timelineItem.cumulativeDeaths += item.cumulativeDeaths;
 		}
 	}
 
@@ -107,7 +110,7 @@ export default class CovidData {
 			cases -= pc;
 			deaths -= pd;
 
-			var newItem = {date: date, cases: cases, deaths: deaths};
+			var newItem = {date: date, cases: cases, deaths: deaths, cumulativeCases: previousCases, cumulativeDeaths: previousDeaths};
 
 			this.addToSeries(nationalSeries, newItem);
 

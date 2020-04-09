@@ -11,11 +11,15 @@ class SeriesChart extends React.Component {
 		var labels = [];
 		var casesData = [];
 		var deathsData = [];
+		var cumulativeCasesData = [];
+		var cumulativeDeathsData = [];
 		for (var i = 0; i < series.timeline.length; i += 1) {
 			var item = series.timeline[i];
 			labels.push(item.date.replace(/2020-/, ""));
 			casesData.push(item.cases);
 			deathsData.push(item.deaths);
+			cumulativeCasesData.push(item.cumulativeCases);
+			cumulativeDeathsData.push(item.cumulativeDeaths);
 		}
 
 		return {
@@ -35,6 +39,22 @@ class SeriesChart extends React.Component {
 				borderWidth: 2,
 				fill: false,
 				data: deathsData
+			},
+			{
+				label: 'Cumulative Cases',
+				backgroundColor: "#333333",
+				borderColor: 'rgba(200,200,100,0.5)',
+				borderWidth: 2,
+				fill: false,
+				data: cumulativeCasesData
+			},
+			{
+				label: 'Cumulative Deaths',
+				backgroundColor: "#333333",
+				borderColor: 'rgba(100,30,30,0.5)',
+				borderWidth: 2,
+				fill: false,
+				data: cumulativeDeathsData
 			}]
 		};
 	}
@@ -48,7 +68,7 @@ class SeriesChart extends React.Component {
 	}
 
 	chartRef = React.createRef();
-	state = {type: "logarithmic"};
+	state = {type: "linear"};
 
 	render() {
 	    const options = {
