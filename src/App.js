@@ -2,12 +2,12 @@ import React from 'react';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import CovidData from './CovidData';
+import Link from '@material-ui/core/Link';
 import './App.css';
 
 class App extends React.Component {
 	/* this.state = 
 		{
-			nationalSeries,
 			statesData,
 			selectedState,
 			selectedCounty
@@ -19,8 +19,8 @@ class App extends React.Component {
 		this.state = {};
 		this.calcStatesList = this.calcStatesList.bind(this);		
 		this.calcCountiesList = this.calcCountiesList.bind(this);		
-		this.stateSelected = this.stateSelected.bind(this);		
-		this.countySelected = this.countySelected.bind(this);		
+		this.handleStateSelected = this.handleStateSelected.bind(this);		
+		this.handleCountySelected = this.handleCountySelected.bind(this);		
 	}
 
 	calcStatesList(statesData) {
@@ -29,7 +29,7 @@ class App extends React.Component {
 		for (var i = 0; i < keys.length; i += 1) {
 			const stateName = keys[i];
 			const stateData = statesData[stateName];
-			result.push({name: stateName, cases: stateData.series.cases});
+			result.push({name: stateName, cases: stateData.countiesData[CovidData.allCounties].cases});
 		}
 		return result;
 	}
@@ -47,17 +47,17 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.covidData = new CovidData((data) => {
+		this.covidData = new CovidData("build/us-counties-4-7-20.csv", (data) => {
 			data.statesList = this.calcStatesList(data.statesData);
 			this.setState(data);
 		});
 	}
 
-	stateSelected(stateName) {
+	handleStateSelected(stateName) {
 		this.setState({selectedState: stateName});
 	}
 
-	countySelected(countyName) {
+	handleCountySelected(countyName) {
 		this.setState({selectedCounty: countyName});
 	}
 
@@ -77,20 +77,53 @@ class App extends React.Component {
 	    position: "absolute",
 	    top: "10px",
 	    left: "400px",
-	    height: "1200px",
+	    height: "600px",
 	    width: "1200px",
+	    backgroundColor: "#ffffff"
 	};
 
+	nytStyle = {
+	    position: "absolute",
+	    top: "570px",
+	    left: "20px",
+		fontSize: "10px",
+		textAlign: "right"
+	}
+
+	larkdalesStyle = {
+	    position: "absolute",
+	    top: "600px",
+	    left: "20px",
+		fontSize: "10px",
+		textAlign: "right"
+	}
+
 	render() {
+		var title = (this.state.selectedCounty === CovidData.allCounties) 
+			? this.state.selectedState + "," + this.state.selectedCounty
+			: this.state.selectedState + ", " + this.state.selectedCounty + " county";
 		return (
 			<div className="App">
-				{this.state.statesList && <div style={this.stateStyle}><RegionTable backgroundColor="#ffffe0" title="State" list={this.state.statesList} selected={this.stateSelected}/></div>}
-				{this.state.selectedState && <div style={this.countyStyle}><RegionTable backgroundColor="#fffff4" title="County" list={this.calcCountiesList(this.state.statesData, this.state.selectedState)} selected={this.countySelected}/></div>}
-				{this.state.selectedCounty && <div style={this.chartStyle}>
-					<SeriesChart series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/>
-				</div>}
-			</div>
-		);
+				{this.state.statesList && <div style={this.stateStyle}>
+					<RegionTable selectTopItem="true" backgroundColor="#ffffe0" title="State"
+						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
+				{this.state.selectedState && <div style={this.countyStyle}>
+					<RegionTable selectTopItem="true" backgroundColor="#fffff4" title="County"
+						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
+						onSelected={this.handleCountySelected}/></div>}
+				{this.state.selectedCounty && <div>
+					<SeriesChart style={this.chartStyle}
+						title={title}
+						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/></div>}
+				<div style={this.nytStyle}>
+					Thanks to the<Link target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times </Link>
+					for the data. Last updated Apr 7, 2020.
+				</div>
+				<div style={this.larkdalesStyle}>
+					Like country, bluegrass, gospel, or sea chanties? Try
+					<Link target="_blank" href="https://larkdales.com/"> The Larkdales</Link>.
+				</div>
+			</div>);
 	}
 }
 

@@ -20,21 +20,24 @@ const regionTableStyle = {
     maxHeight: "500px",
 };
 
-class RegionTable extends React.Component {
+export default class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
+		this.selectedIndex = 0;
 		this.style = Object.assign({backgroundColor: props.backgroundColor}, regionTableStyle);
-		this.state = {selection: null, list: props.list};
+		this.state = {
+			selection: this.props.list[this.selectedIndex].name,
+			list: this.createSortedList("cases", false), 
+			sortBy: "cases",
+			sortAscending: false
+		};
 	    this.handleCellClick = this.handleCellClick.bind(this);		
 	    this.select = this.select.bind(this);		
 	    this.handleNextClick = this.handleNextClick.bind(this);		
 	    this.handlePrevClick = this.handlePrevClick.bind(this);		
-	    this.sortByName = this.sortByName.bind(this);		
-	    this.sortByCases = this.sortByCases.bind(this);
-	    this.sortBy = "cases";	
+	    this.toggleSort = this.toggleSort.bind(this);
 	    this.selectedRef = React.createRef();
 	    this.tableContainerRef = React.createRef();
-	    this.selectedIndex = -1;
 	}
 
 	sortArray(array, property, numeric, ascending) {
@@ -63,49 +66,52 @@ class RegionTable extends React.Component {
 
 	select(name) {
 		this.setState({selection: name});
-		for (var i = 0; i < this.state.list.length; i += 1) {
-			if (this.state.list[i].name === name) {
-				this.selectedIndex = i;
-				break;
-			}
-		}
-		this.props.selected(name);
+		this.props.onSelected(name);
 	}
 
 	handleCellClick(e, name) {
 		this.select(name);
 	}
 
+	findSelectedIndex() {
+		for (var i = 0; i < this.state.list.length; i += 1) {
+			if (this.state.list[i].name === this.state.selection) {
+				return i;
+			}
+ 		}
+ 		// alert("error");
+	}
+
 	handleNextClick(e) {
-		if (this.selectedIndex < this.state.list.length - 1) {
-			this.selectedIndex += 1;
+		let index = this.findSelectedIndex();
+		if (index < this.state.list.length - 1) {
+			index += 1;
 		}
-		this.select(this.state.list[this.selectedIndex].name);	
+		this.select(this.state.list[index].name);	
 	}
 
 	handlePrevClick(e) {
-		if (this.selectedIndex > 0) {
-			this.selectedIndex -= 1;
+		let index = this.findSelectedIndex();
+		if (index > 0) {
+			index -= 1;
 		}
-		this.select(this.state.list[this.selectedIndex].name);	
+		this.select(this.state.list[index].name);	
 	}
 
-	sortByName() {
-		this.setState({sortBy: "name"});
-	}
-
-	sortByCases() {
-		this.setState({sortBy: "cases"});
-	}
-
-	createSortedList() {
-		var list;
+	toggleSort() {
 		if (this.state.sortBy === "cases") {
-			list = this.sortArray(this.props.list, "cases", true, false);
+			this.setState({sortBy: "name", sortAscending: true});
 		} else {
-			list = this.sortArray(this.props.list, "name", false, true);
+			this.setState({sortBy: "cases", sortAscending: false});
 		}
-		this.setState({list: list});
+	}
+
+	createSortedList(sortBy, ascending) {
+		if (sortBy === "cases") {
+			return this.sortArray(this.props.list, "cases", true, ascending);
+		} else {
+			return this.sortArray(this.props.list, "name", false, ascending);
+		}
 	}
 
 	ensureSelectionVisible() {
@@ -124,11 +130,24 @@ class RegionTable extends React.Component {
 		}
 	}
 
+	listsEqual(a, b) {
+		return (a.length === b.length) && (a.length === 0 || (a[0].name === b[0].name));
+	}
+
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		this.ensureSelectionVisible();
-		if (prevState.sortBy != this.state.sortBy || prevProps.list !== this.props.list) {
-			this.createSortedList();
+		var listChanged = !this.listsEqual(prevProps.list, this.props.list);
+		if ((prevState.sortBy !== this.state.sortBy) || (prevState.sortAscending !== this.state.sortAscending) || listChanged) {
+			this.setState({list: this.createSortedList(this.state.sortBy, this.state.sortAscending)});
 		}
+		if (listChanged) {
+			this.selectedIndex = 0;
+			this.select(this.state.list[this.selectedIndex].name);	
+		}
+		this.ensureSelectionVisible();
+	}
+
+	componentDidMount() {
+		this.props.onSelected(this.state.selection);
 	}
 
 	render() {
@@ -138,12 +157,11 @@ class RegionTable extends React.Component {
 				<Button onClick={this.handleNextClick}>▶</Button>
 			</div>
 			<TableContainer ref={this.tableContainerRef} style={this.style}>
-				{/* onRowClicked={this.handleRowSelected} */}
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
             			<TableRow style={slimStyle}>
-              				<TableCell style={slimStyle} onClick={this.sortByName} align="left">{this.props.title}</TableCell>
-              				<TableCell style={slimStyle} onClick={this.sortByCases} align="right">Cases</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">Cases</TableCell>
             			</TableRow>            
      				</TableHead>
 
@@ -162,5 +180,3 @@ class RegionTable extends React.Component {
 		</div>);
 	}
 }
-
-export default RegionTable;
