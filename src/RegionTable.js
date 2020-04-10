@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-	Button,
 	Link,
 	Table,
 	TableHead,
@@ -10,9 +9,10 @@ import {
 	TableContainer
 } from '@material-ui/core';
 import './App.css';
+import Analytics from './Analytics';
 
 const slimStyle = {height: "0px", padding: "0px"};
-const buttonsStyle = {position: "relative", left: "70px"};
+const buttonsStyle = {position: "relative", left: "70px", fontSize: "20px"};
 const regionTableStyle = {
    	height: "500px",
     maxHeight: "500px",
@@ -71,6 +71,7 @@ export default class RegionTable extends React.Component {
 	}
 
 	handleCellClick(e, name) {
+		Analytics.itemSelected(this.props.title, name);
 		this.select(name);
 	}
 
@@ -89,6 +90,7 @@ export default class RegionTable extends React.Component {
 			index += 1;
 		}
 		this.select(this.state.list[index].name);	
+		Analytics.arrowClicked();
 	}
 
 	handlePrevClick(e) {
@@ -97,6 +99,7 @@ export default class RegionTable extends React.Component {
 			index -= 1;
 		}
 		this.select(this.state.list[index].name);	
+		Analytics.arrowClicked();
 	}
 
 	toggleSort() {
@@ -154,8 +157,6 @@ export default class RegionTable extends React.Component {
 	render() {
 		return (<div>
 			<div style={buttonsStyle}>
-				{/*<Button onClick={this.handlePrevClick} size="small" style={{width: "10px", height: "10px"}}>◀</Button>
-				<Button onClick={this.handleNextClick} size="small" style={{width: "10px", height: "10px"}}>▶</Button>*/}
 				<Link href="#" onClick={this.handlePrevClick}>◀</Link>
 				&nbsp;
 				<Link href="#" onClick={this.handleNextClick}>▶</Link>

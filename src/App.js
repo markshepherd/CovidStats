@@ -2,15 +2,16 @@ import React from 'react';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import CovidData from './CovidData';
-import { Link } from '@material-ui/core/';
+import MyLink from './MyLink';
 import './App.css';
 
 const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
-// for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build/"
+// for development=true, set package.json.homepage = ""
 const pathPrefix = development ? "build/" : "";
 const dataDate = "4-9-20";
 const uiDate = "Apr 9, 2020"
+
 
 class App extends React.Component {
 	/* this.state = 
@@ -69,11 +70,6 @@ class App extends React.Component {
 		this.setState({selectedCounty: countyName});
 	}
 
-	// handleResize(e) {
-	// 	console.log("handleResize", e.currentTarget);
-	// }
-	//  onResize={this.handleResize}
-
 	render() {
 		var title = (this.state.selectedCounty === CovidData.allCounties) 
 			? this.state.selectedState + "," + this.state.selectedCounty
@@ -103,34 +99,33 @@ class App extends React.Component {
 
 				<div className="notes">
 					<div className="notesText">
-						<p>This page created by 
-						<Link target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd.</Link>
-						</p>
-						<p>
-						Data provided by the <Link target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</Link>.
+						<p>This page was created by 
+						<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
+						The source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
+						Data is provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
 						</p>
 						<p>
 						Do you like country music, gospel, or sea chanties?
-						Try<Link target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</Link>...
+						Try<MyLink target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</MyLink>...
 						</p>
 					</div>
 
 					<div className="socialIcons">
-						<Link target="_blank" href="https://twitter.com/MarkEShepherd">
+						<MyLink target="_blank" href="https://twitter.com/MarkEShepherd">
 						 	<img className="socialIcon"
 						 		align="right"
 						 		alt="Go to Mark's Twitter"
 						  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
-						</Link>
+						</MyLink>
 						<br/>
 						<br/>
 						<br/>
-						<Link target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
+						<MyLink target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
 						 	<img className="socialIcon"
 						 		align="right"
 						 		alt="Go to The Larkdales on Spotify"
 						  		src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
-						</Link>
+						</MyLink>
 					</div>
 				</div>
 			</div>);

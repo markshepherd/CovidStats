@@ -2,6 +2,7 @@ import React from 'react';
 import {Line} from 'react-chartjs-2';
 import './App.css';
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+import Analytics from './Analytics';
 
 const buttonsStyle = {position: "absolute", left: "10px", top: "5px"};
 const containerStyle = {position: "relative", top: "0px"};
@@ -65,10 +66,12 @@ class SeriesChart extends React.Component {
 	}
 
 	handleLinearClick = () => {
+		Analytics.linearLogToggleClicked();
     	this.setState({type: "linear"});
 	}
 
 	handleLogClick = () => {
+		Analytics.linearLogToggleClicked();
 		this.setState({type: "logarithmic"});
 	}
 
@@ -79,7 +82,7 @@ class SeriesChart extends React.Component {
 			},
 			responsive: true,
 			maintainAspectRatio: true,
-			onResize: (x) => console.log("resize", x),
+			/* onResize: (x) => console.log("resize", x), */
 			legend: {position: 'top'},
 			title: {display: true, text: this.props.title},
 			scales: {
