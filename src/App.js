@@ -5,13 +5,12 @@ import CovidData from './CovidData';
 import { Link } from '@material-ui/core/';
 import './App.css';
 
-const development = true;
+const development = false;
 const pathPrefix = development ? "build/" : "";
 const dataDate = "4-8-20";
 const uiDate = "Apr 8, 2020"
 
 class App extends React.Component {
-
 	/* this.state = 
 		{
 			statesData,
@@ -74,19 +73,19 @@ class App extends React.Component {
 			: this.state.selectedState + ", " + this.state.selectedCounty + " county";
 
 		return (
-			<div className="MyApp"> 
-				<div className="headerbar headerBox">
+			<div className="app"> 
+				<div className="header">
 					<span className="myheader">Covid-19 Statistics by U.S. State and County</span>
 					<br/>
 					Last updated {uiDate}.
 				</div>
 
 				{this.state.statesList && <div className="state">
-					<RegionTable selectTopItem="true" backgroundColor="#ffffe0" title="State"
+					<RegionTable backgroundColor="#ffffe0" title="State"
 						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
 
 				{this.state.selectedState && <div className="county">
-					<RegionTable selectTopItem="true" backgroundColor="#fffff4" title="County"
+					<RegionTable backgroundColor="#fffff4" title="County"
 						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
 						onSelected={this.handleCountySelected}/></div>}
 
@@ -94,7 +93,7 @@ class App extends React.Component {
 					<SeriesChart
 						title={title}
 						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/></div>}
-						
+
 				<div className="notes">
 					<div className="notesText">
 						<p>This page created by 
@@ -126,38 +125,9 @@ class App extends React.Component {
 						  		src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
 						</Link>
 					</div>
-					{/*}
-					<div>
-						<span style={{textAlign: "left"}}>
-						</span>
-						<span style={{textAlign: "right"}}>
-						</span>
-					</div>
-					*/}
 				</div>
 			</div>);
 	}
 }
 
 export default App;
-
-/*
-Simport Icon from '@material-ui/core/Icon';
-import { makeStyles } from '@material-ui/styles';
-...
-
-<Icon classes={{root: classes.iconRoot}}>
-  <img className={classes.imageIcon} src="/graphics/firebase-logo.svg"/>
-</Icon>
-
-Styles:
-
-const useStyles = makeStyles({
-  imageIcon: {
-    height: '100%'
-  },
-  iconRoot: {
-    textAlign: 'center'
-  }
-});
-*/

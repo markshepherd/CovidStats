@@ -10,15 +10,14 @@ import {
 } from '@material-ui/core';
 import './App.css';
 
-// trying to make the table entry height as small as possible. I got some ideas from
-// https://stackoverflow.com/questions/39210565/material-ui-change-rows-height-and-padding-in-table
 const slimStyle = {height: "0px", padding: "0px"};
 const buttonsStyle = {position: "relative", left: "20px"};
 const regionTableStyle = {
-    height: "500px",
-    width: "150px",
+   	height: "500px",
     maxHeight: "500px",
-    marginLeft: "10px"
+    marginLeft: "10px",
+    marginRight: "10px",
+	borderRadius: "10px"
 };
 
 export default class RegionTable extends React.Component {
