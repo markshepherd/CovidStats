@@ -2,25 +2,31 @@ import React from 'react';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import CovidData from './CovidData';
-import Link from '@material-ui/core/Link';
+import { Link } from '@material-ui/core/';
 import './App.css';
+
+const development = false;
+const pathPrefix = development ? "build/" : "";
+const dataDate = "4-8-20";
+const uiDate = "Apr 8, 2020"
 
 class App extends React.Component {
 	/* this.state = 
 		{
 			statesData,
+			statesList,
 			selectedState,
 			selectedCounty
 	 	}
 	*/
 
-	constructor(props) {
+	constructor(props) {	
 		super(props);
 		this.state = {};
 		this.calcStatesList = this.calcStatesList.bind(this);		
 		this.calcCountiesList = this.calcCountiesList.bind(this);		
 		this.handleStateSelected = this.handleStateSelected.bind(this);		
-		this.handleCountySelected = this.handleCountySelected.bind(this);		
+		this.handleCountySelected = this.handleCountySelected.bind(this);	
 	}
 
 	calcStatesList(statesData) {
@@ -47,7 +53,7 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.covidData = new CovidData("build/us-counties-4-7-20.csv", (data) => {
+		this.covidData = new CovidData(`${pathPrefix}us-counties-${dataDate}.csv`, (data) => {
 			data.statesList = this.calcStatesList(data.statesData);
 			this.setState(data);
 		});
@@ -61,67 +67,64 @@ class App extends React.Component {
 		this.setState({selectedCounty: countyName});
 	}
 
-	stateStyle = {
-	    position: "absolute",
-	    top: "10px",
-	    left: "20px"
-	};
-
-	countyStyle = {
-	    position: "absolute",
-	    top: "10px",
-	    left: "200px"
-	};
-
-	chartStyle = {
-	    position: "absolute",
-	    top: "10px",
-	    left: "400px",
-	    height: "600px",
-	    width: "1200px",
-	    backgroundColor: "#ffffff"
-	};
-
-	nytStyle = {
-	    position: "absolute",
-	    top: "570px",
-	    left: "20px",
-		fontSize: "10px",
-		textAlign: "right"
-	}
-
-	larkdalesStyle = {
-	    position: "absolute",
-	    top: "600px",
-	    left: "20px",
-		fontSize: "10px",
-		textAlign: "right"
-	}
-
 	render() {
 		var title = (this.state.selectedCounty === CovidData.allCounties) 
 			? this.state.selectedState + "," + this.state.selectedCounty
 			: this.state.selectedState + ", " + this.state.selectedCounty + " county";
+
 		return (
-			<div className="App">
-				{this.state.statesList && <div style={this.stateStyle}>
-					<RegionTable selectTopItem="true" backgroundColor="#ffffe0" title="State"
+			<div className="app"> 
+				<div className="header">
+					<span className="myheader">Covid-19 Statistics by U.S. State and County</span>
+					<br/>
+					Last updated {uiDate}.
+				</div>
+
+				{this.state.statesList && <div className="state">
+					<RegionTable backgroundColor="#ffffe0" title="State"
 						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
-				{this.state.selectedState && <div style={this.countyStyle}>
-					<RegionTable selectTopItem="true" backgroundColor="#fffff4" title="County"
+
+				{this.state.selectedState && <div className="county">
+					<RegionTable backgroundColor="#fffff4" title="County"
 						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
 						onSelected={this.handleCountySelected}/></div>}
-				{this.state.selectedCounty && <div>
-					<SeriesChart style={this.chartStyle}
+
+				{this.state.selectedCounty && <div className="chart">
+					<SeriesChart
 						title={title}
 						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}/></div>}
-				<div style={this.nytStyle}>
-					Thanks to the<Link target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times </Link>
-					for the data. Last updated Apr 7, 2020.
-				</div>
-				<div style={this.larkdalesStyle}>
-					Like country, bluegrass, gospel, or sea chanties? Try
-					<Link target="_blank" href="https://larkdales.com/"> The Larkdales</Link>.
+
+				<div className="notes">
+					<div className="notesText">
+						<p>This page created by 
+						<Link target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd.</Link>
+						</p>
+						<p>
+						Data provided by the <Link target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</Link>.
+						</p>
+						<p>
+						Do you like country music, gospel, or sea chanties?
+						Try<Link target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</Link>...
+						</p>
+					</div>
+
+					<div className="socialIcons">
+						<Link target="_blank" href="https://twitter.com/MarkEShepherd">
+						 	<img className="socialIcon"
+						 		align="right"
+						 		alt="Go to Mark's Twitter"
+						  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
+						</Link>
+						<br/>
+						<br/>
+						<br/>
+						<Link target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
+						 	<img className="socialIcon"
+						 		align="right"
+						 		alt="Go to The Larkdales on Spotify"
+						  		src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
+						</Link>
+					</div>
 				</div>
 			</div>);
 	}

@@ -3,7 +3,8 @@ import {Line} from 'react-chartjs-2';
 import './App.css';
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 
-const buttonsStyle = {position: "absolute", left: "5px", top: "5px"};
+const buttonsStyle = {position: "absolute", left: "10px", top: "5px"};
+const containerStyle = {position: "relative", top: "0px"};
 const radioStyle = {height: "25px"};
 
 class SeriesChart extends React.Component {
@@ -11,11 +12,15 @@ class SeriesChart extends React.Component {
 		var labels = [];
 		var casesData = [];
 		var deathsData = [];
+		var cumulativeCasesData = [];
+		var cumulativeDeathsData = [];
 		for (var i = 0; i < series.timeline.length; i += 1) {
 			var item = series.timeline[i];
 			labels.push(item.date.replace(/2020-/, ""));
 			casesData.push(item.cases);
 			deathsData.push(item.deaths);
+			cumulativeCasesData.push(item.cumulativeCases);
+			cumulativeDeathsData.push(item.cumulativeDeaths);
 		}
 
 		return {
@@ -35,6 +40,22 @@ class SeriesChart extends React.Component {
 				borderWidth: 2,
 				fill: false,
 				data: deathsData
+			},
+			{
+				label: 'Cumulative Cases',
+				backgroundColor: "#333333",
+				borderColor: 'rgba(200,200,100,0.5)',
+				borderWidth: 2,
+				fill: false,
+				data: cumulativeCasesData
+			},
+			{
+				label: 'Cumulative Deaths',
+				backgroundColor: "#333333",
+				borderColor: 'rgba(100,30,30,0.5)',
+				borderWidth: 2,
+				fill: false,
+				data: cumulativeDeathsData
 			}]
 		};
 	}
@@ -48,7 +69,7 @@ class SeriesChart extends React.Component {
 	}
 
 	chartRef = React.createRef();
-	state = {type: "logarithmic"};
+	state = {type: "linear"};
 
 	render() {
 	    const options = {
@@ -74,14 +95,14 @@ class SeriesChart extends React.Component {
 			}
 		};
 
-		return (<div style={this.props.style}>
-			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
+		return (<div style={containerStyle}>
 			<div style={buttonsStyle}>
 		        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
-		          <FormControlLabel control={<Radio color=""/>} size="small" style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
-		          <FormControlLabel control={<Radio color=""/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
+		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
+		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
 		        </RadioGroup>
 			</div>
+			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
 		</div>);
 	}
 }	

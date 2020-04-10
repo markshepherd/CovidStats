@@ -10,14 +10,14 @@ import {
 } from '@material-ui/core';
 import './App.css';
 
-// trying to make the table entry height as small as possible. I got some ideas from
-// https://stackoverflow.com/questions/39210565/material-ui-change-rows-height-and-padding-in-table
 const slimStyle = {height: "0px", padding: "0px"};
-const buttonsStyle = {position: "relative", left: "0px", width: "150px"};
+const buttonsStyle = {position: "relative", left: "20px"};
 const regionTableStyle = {
-    height: "500px",
-    width: "150px",
+   	height: "500px",
     maxHeight: "500px",
+    marginLeft: "10px",
+    marginRight: "10px",
+	borderRadius: "10px"
 };
 
 export default class RegionTable extends React.Component {
@@ -160,8 +160,8 @@ export default class RegionTable extends React.Component {
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
             			<TableRow style={slimStyle}>
-              				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}</TableCell>
-              				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">Cases</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}{this.state.sortBy === "name" ? "▲" : ""}</TableCell>
+              				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">{this.state.sortBy === "cases" ? "▼" : ""}Cases</TableCell>
             			</TableRow>            
      				</TableHead>
 

@@ -1,38 +1,92 @@
-.App {
+/* classes for the top-level grid*/
+
+.app {
+  display: grid;
+  grid-template-columns: 160px 170px;
+  grid-template-rows: 65px minmax(300px, 1fr) 80px;
+  grid-template-areas: 
+    "states counties header"
+    "states counties chart"
+    "notes  notes    chart";
+  grid-gap: 10px;
+}
+
+.state {
+  grid-area: states;
+  flex: auto;
+  min-height: 0;
+}
+
+.county {
+  grid-area: counties;
+  flex: auto;
+  min-height: 0;
+}
+
+.notes {
+  grid-area: notes;
+  font-size: 12px;
+  text-align: left;
+  margin-left: 10px;
+  display: grid;
+  grid-template-columns: 270px 40px;
+}
+
+.header {
+  grid-area: header;
+  font-size: 13px;
   text-align: center;
+  line-height: 1.4;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.chart {
+  grid-area: chart;
+  margin-left: 10px;
+  flex: auto;
+  min-width: 0;
+  background-color: #ffffff;
+  margin-right: 10px;
+  border-radius: 15px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* other classes for App.js */
+
+p {
+  margin-top: 7px; /* between paragraphs */
+  margin-bottom: 0px; /* between paragraphs */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.notesText {
+  grid-column: 1;
 }
 
-.App-link {
-  color: #61dafb;
+.socialIcons {
+  grid-column: 2;
+  margin-top: 15px;
+  max-width: 60px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.socialIcon {
+  height: 25px;
+  width: 25px;
+}
+
+.myheader {
+  font-size: 23px;
+  font-weight: bold;
+}
+
+/* classes for RegionTable.js */
+
+.slim: {
+  height: 0px;
+  padding: 0px;
+}
+
+.regionTable: {
+  height: 500px;
+  maxHeight: 500px;
+  marginLeft: 10px;
+  marginRight: 10px;
+  borderRadius: 10px;
 }
