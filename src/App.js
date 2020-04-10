@@ -99,14 +99,14 @@ class App extends React.Component {
 
 				<div className="notes">
 					<div className="notesText">
-						<p>This page was created by 
+						<p>Created by 
 						<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
 						The source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
 						Data is provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
 						</p>
 						<p>
-						Do you like country music, gospel, or sea chanties?
-						Try<MyLink target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</MyLink>...
+						For the finest blend of country, gospel, and sea chanties,
+						try<MyLink target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</MyLink>...
 						</p>
 					</div>
 
