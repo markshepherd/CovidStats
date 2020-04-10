@@ -8,6 +8,10 @@ const containerStyle = {position: "relative", top: "0px"};
 const radioStyle = {height: "25px"};
 
 class SeriesChart extends React.Component {
+
+	chartRef = React.createRef();
+	state = {type: "linear"};
+	
 	createChartData (series) {
 		var labels = [];
 		var casesData = [];
@@ -68,15 +72,14 @@ class SeriesChart extends React.Component {
 		this.setState({type: "logarithmic"});
 	}
 
-	chartRef = React.createRef();
-	state = {type: "linear"};
-
 	render() {
 	    const options = {
 			animation: {
 				duration: 300
 			},
 			responsive: true,
+			maintainAspectRatio: true,
+			onResize: (x) => console.log("resize", x),
 			legend: {position: 'top'},
 			title: {display: true, text: this.props.title},
 			scales: {

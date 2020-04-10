@@ -1,6 +1,7 @@
 import React from 'react';
 import { 
 	Button,
+	Link,
 	Table,
 	TableHead,
 	TableBody,
@@ -11,7 +12,7 @@ import {
 import './App.css';
 
 const slimStyle = {height: "0px", padding: "0px"};
-const buttonsStyle = {position: "relative", left: "20px"};
+const buttonsStyle = {position: "relative", left: "70px"};
 const regionTableStyle = {
    	height: "500px",
     maxHeight: "500px",
@@ -153,8 +154,11 @@ export default class RegionTable extends React.Component {
 	render() {
 		return (<div>
 			<div style={buttonsStyle}>
-				<Button onClick={this.handlePrevClick}>◀</Button>
-				<Button onClick={this.handleNextClick}>▶</Button>
+				{/*<Button onClick={this.handlePrevClick} size="small" style={{width: "10px", height: "10px"}}>◀</Button>
+				<Button onClick={this.handleNextClick} size="small" style={{width: "10px", height: "10px"}}>▶</Button>*/}
+				<Link href="#" onClick={this.handlePrevClick}>◀</Link>
+				&nbsp;
+				<Link href="#" onClick={this.handleNextClick}>▶</Link>
 			</div>
 			<TableContainer ref={this.tableContainerRef} style={this.style}>
 				<Table stickyHeader style={slimStyle} size="small">

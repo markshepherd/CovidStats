@@ -5,18 +5,26 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="minimum-scale=1, width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Covid-19 U.S. County statistics viewer"
-    />
+    <meta name="description" content="Covid-19 U.S. County statistics viewer"/>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163350727-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-163350727-1');
+    </script>
+
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>Covid-19 by U.S. County</title>
-    <!--<style>
+    <style>
       .root {
         width: 100%;
       }
-    </style>-->
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -27,7 +35,7 @@
 
       Many thanks to the New York Times for the data.
 
-      Sorry for the clumsy code, this is my first react project 😬.
+      Sorry for the clumsy code and primitive UI. I'm still learning... 😬.
     -->
   </body>
 </html>

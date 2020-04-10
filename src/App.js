@@ -6,6 +6,8 @@ import { Link } from '@material-ui/core/';
 import './App.css';
 
 const development = false;
+// for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
+// for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build/"
 const pathPrefix = development ? "build/" : "";
 const dataDate = "4-8-20";
 const uiDate = "Apr 8, 2020"
@@ -66,6 +68,11 @@ class App extends React.Component {
 	handleCountySelected(countyName) {
 		this.setState({selectedCounty: countyName});
 	}
+
+	// handleResize(e) {
+	// 	console.log("handleResize", e.currentTarget);
+	// }
+	//  onResize={this.handleResize}
 
 	render() {
 		var title = (this.state.selectedCounty === CovidData.allCounties) 

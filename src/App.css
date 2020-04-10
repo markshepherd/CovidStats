@@ -2,25 +2,29 @@
 
 .app {
   display: grid;
-  grid-template-columns: 160px 170px;
-  grid-template-rows: 65px minmax(300px, 1fr) 80px;
+  grid-template-columns: 160px 160px;
+  grid-template-rows: 65px minmax(200px, 1fr) 80px;
   grid-template-areas: 
-    "states counties header"
+    "header header header"
     "states counties chart"
     "notes  notes    chart";
   grid-gap: 10px;
+  /*height: 100%;
+  width: 100%;*/
 }
 
 .state {
   grid-area: states;
-  flex: auto;
+  /*flex: auto;*/
   min-height: 0;
+  /*background-color: #ffff00;*/
 }
 
 .county {
   grid-area: counties;
-  flex: auto;
+  /*flex: auto;*/
   min-height: 0;
+  /*background-color: #ffeeff;*/
 }
 
 .notes {
@@ -29,7 +33,7 @@
   text-align: left;
   margin-left: 10px;
   display: grid;
-  grid-template-columns: 270px 40px;
+  grid-template-columns: 280px 40px;
 }
 
 .header {
@@ -62,7 +66,7 @@ p {
 
 .socialIcons {
   grid-column: 2;
-  margin-top: 15px;
+  margin-top: 5px;
   max-width: 60px;
 }
 
