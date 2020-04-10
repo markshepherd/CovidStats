@@ -1,6 +1,5 @@
 import React from 'react';
 import {Line} from 'react-chartjs-2';
-import './App.css';
 import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
 import Analytics from './Analytics';
 
@@ -9,7 +8,6 @@ const containerStyle = {position: "relative", top: "0px"};
 const radioStyle = {height: "25px"};
 
 class SeriesChart extends React.Component {
-
 	chartRef = React.createRef();
 	state = {type: "linear"};
 	

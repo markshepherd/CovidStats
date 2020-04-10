@@ -8,14 +8,15 @@ import {
 	TableCell,
 	TableContainer
 } from '@material-ui/core';
-import './App.css';
 import Analytics from './Analytics';
+import './App.css';
+
 
 const slimStyle = {height: "0px", padding: "0px"};
 const buttonsStyle = {position: "relative", left: "70px", fontSize: "20px"};
 const regionTableStyle = {
-   	height: "500px",
-    maxHeight: "500px",
+   	height: "400px",
+    maxHeight: "400px",
     marginLeft: "10px",
     marginRight: "10px",
 	borderRadius: "10px"

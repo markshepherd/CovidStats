@@ -139,7 +139,7 @@ export default class CovidData {
 		}
 		this.optimizeSeries(nationalSeries);
 		statesData[CovidData.allStates] = {countiesData: {[CovidData.allCounties]: nationalSeries}};
-		this.callback({statesData: statesData});
+		this.callback(statesData);
 	}
 
 	/*private*/ readBigDataFile(filepath) {
