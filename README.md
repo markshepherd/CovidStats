@@ -6,7 +6,7 @@ Many thanks to the New York Times for the data.
 
 Sorry for the clumsy code and primitive UI. I'm still learning... 😬.
 
-Following is boilerplate documenatation produced by tbe React framework's "Create React App" tool.
+Following is boilerplate documentation produced by tbe React framework's "Create React App" tool.
 
 ----------
 
