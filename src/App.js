@@ -12,8 +12,8 @@ const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
-const dataDate = "4-9-20";
-const uiDate = "Apr 9, 2020"
+const dataDate = "4-10-20";
+const uiDate = "Apr 10, 2020"
 
 const MyTooltip = withStyles((theme) => ({
   tooltip: {
@@ -60,7 +60,7 @@ class App extends React.Component {
 
 	constructor(props) {	
 		super(props);
-		this.state = {startDate: "2020-01-21"};
+		this.state = {startDate: "2020-03-01"};
 		this.calcStatesList = this.calcStatesList.bind(this);		
 		this.calcCountiesList = this.calcCountiesList.bind(this);		
 		this.handleStateSelected = this.handleStateSelected.bind(this);		
@@ -122,7 +122,6 @@ class App extends React.Component {
 			var x = element === date;
 			return x;
 		});
-		console.log(234);
 		return result;
 	}
 
@@ -178,12 +177,8 @@ class App extends React.Component {
 					<div className="notesText">
 						<p>Created by 
 						<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
-						The source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
-						Data is provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
-						</p>
-						<p>
-						For the finest blend of country, gospel, and sea chanties,
-						try<MyLink target="_blank" href="https://larkdales.com/"> The&nbsp;Larkdales</MyLink>...
+						Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
+						Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
 						</p>
 					</div>
 
@@ -194,15 +189,6 @@ class App extends React.Component {
 						 		alt="Go to Mark's Twitter"
 						  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
 						</MyLink>
-						<br/>
-						<br/>
-						<br/>
-						<MyLink target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
-						 	<img className="socialIcon"
-						 		align="right"
-						 		alt="Go to The Larkdales on Spotify"
-						  		src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
-						</MyLink>
 					</div>
 					<div className="dateControl">
 						<span>Choose starting date of graph...</span>
@@ -211,7 +197,7 @@ class App extends React.Component {
 							min={0}
 							max={this.state.dateList.length - 1}
 							track="inverted"
-							defaultValue={0}
+							defaultValue={this.findDateIndex("2020-03-01")}
 							onChange={this.handleSliderChanged}
 							valueLabelDisplay="auto"
   							valueLabelFormat={(index) => this.state.dateList[index]}	

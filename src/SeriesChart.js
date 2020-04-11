@@ -50,6 +50,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(200,200,100,0.5)',
 				borderWidth: 2,
 				fill: false,
+				hidden: true,
 				data: cumulativeCasesData
 			},
 			{
@@ -58,6 +59,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(100,30,30,0.5)',
 				borderWidth: 2,
 				fill: false,
+				hidden: true,
 				data: cumulativeDeathsData
 			}]
 		};
@@ -71,6 +73,10 @@ class SeriesChart extends React.Component {
 	handleLogClick = () => {
 		Analytics.linearLogToggleClicked();
 		this.setState({type: "logarithmic"});
+	}
+
+	handleChartClick = () => {
+		console.log("chartclick");
 	}
 
 	render() {
@@ -106,7 +112,7 @@ class SeriesChart extends React.Component {
 		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
 		        </RadioGroup>
 			</div>
-			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
+			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)} onClick={this.handleChartClick}/>}
 		</div>);
 	}
 }	

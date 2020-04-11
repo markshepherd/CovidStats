@@ -75,6 +75,7 @@ p {
 .dateControl {
   grid-row: 1;
   grid-column: 1 / 3;
+  margin: 10px;
 }
 
 .myheader {
