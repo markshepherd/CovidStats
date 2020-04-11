@@ -15,6 +15,17 @@ class Analytics {
 		this.reportEvent("click", "outbound", url);
 	}
 
+	dateSliderCount = 0;
+
+	dateSliderUsed() {
+		this.dateSliderCount += 1;
+		if (this.dateSliderCount === 1) {
+			this.reportEvent("date_slider_1")
+		} else if (this.dateSliderCount === 5) {
+			this.reportEvent("date_slider_5")
+		}
+	}
+
 	selectCount = {};
 
 	itemSelected(name) {

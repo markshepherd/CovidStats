@@ -1,12 +1,13 @@
 import React from 'react';
+import { Slider, Tooltip } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
+import { useEffect, useRef } from "react";
+
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import CovidData from './CovidData';
-import {Slider} from '@material-ui/core';
+import Analytics from './Analytics';
 import MyLink from './MyLink';
-import { withStyles } from '@material-ui/core/styles';
-import { useEffect, useRef } from "react";
-import Tooltip from "@material-ui/core/Tooltip";
 
 const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
@@ -115,6 +116,7 @@ class App extends React.Component {
 
 	handleSliderChanged(e, value) {
 		this.setState({startDate: this.state.dateList[value]});
+		Analytics.dateSliderUsed();
 	}
 
 	findDateIndex(date) {
