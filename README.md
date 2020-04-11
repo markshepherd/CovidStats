@@ -1,6 +1,6 @@
 This web page was created by Mark Shepherd using React, chart.js, and Material UI.
 
-The source code is at https://github.com/markshepherd/CovidStats.
+You can see the web page at https://mark-shepherd.com/covid-stats
 
 Many thanks to the New York Times for the data.
 
