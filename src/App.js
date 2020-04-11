@@ -13,8 +13,8 @@ const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
-const dataDate = "4-10-20";
-const uiDate = "Apr 10, 2020"
+const dataDate = "4-11-20";
+const uiDate = "Apr 11, 2020"
 Analytics.enable(!development);
 
 const MyTooltip = withStyles((theme) => ({

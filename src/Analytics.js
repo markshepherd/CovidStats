@@ -6,7 +6,7 @@ class Analytics {
 	}
 
 	reportEvent(event, category, label) {
-		console.log("Analytics", event, category, label);
+		// console.log("Analytics", event, category, label);
 		if (this.enabled) {
 			// eslint-disable-next-line no-undef
 			gtag("event", event, {
