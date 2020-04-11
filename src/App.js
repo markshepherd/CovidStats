@@ -9,7 +9,7 @@ import CovidData from './CovidData';
 import Analytics from './Analytics';
 import MyLink from './MyLink';
 
-const development = true;
+const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
@@ -68,6 +68,7 @@ class App extends React.Component {
 		this.handleStateSelected = this.handleStateSelected.bind(this);		
 		this.handleCountySelected = this.handleCountySelected.bind(this);	
 		this.handleSliderChanged = this.handleSliderChanged.bind(this);	
+		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
 		this.trimToStartDate = this.trimToStartDate.bind(this);	
 	}
 
@@ -117,6 +118,9 @@ class App extends React.Component {
 
 	handleSliderChanged(e, value) {
 		this.setState({startDate: this.state.dateList[value]});
+	}
+
+	handleSliderCommited(e, value) {
 		Analytics.dateSliderUsed();
 	}
 
@@ -209,6 +213,7 @@ class App extends React.Component {
 							track="inverted"
 							defaultValue={this.findDateIndex("2020-03-01")}
 							onChange={this.handleSliderChanged}
+							onChangeCommitted={this.handleSliderCommited}
 							valueLabelDisplay="auto"
   							valueLabelFormat={(index) => this.state.dateList[index]}	
   							ValueLabelComponent={FormatSliderValue}

@@ -83,7 +83,7 @@ class SeriesChart extends React.Component {
 			for (var i = 0; i < this.datasetInitiallyHidden.length; i += 1) {
 				const hidden = !this.chartRef.current.chartInstance.isDatasetVisible(i);
 				if (hidden !== this.datasetInitiallyHidden[i]) {
-					Analytics.reportHideShowDataset();
+					Analytics.hideShowDatasetClicked();
 				}
 			}
 		}, 500)
@@ -96,10 +96,7 @@ class SeriesChart extends React.Component {
 			},
 			responsive: true,
 			maintainAspectRatio: true,
-			onClick: this.handleChartClick,
-			// onResize: (x) => console.log("resize", x), */
-			// onComplete: (e) => {console.log("chart onComplete", e);},
-			// onHover: (e) => {if (e.type !== "mousemove") {console.log("chart onHover", e);}},
+			onClick: this.handleChartClick, // there is also onResize, onComplete, onHover
 			legend: {position: 'top'},
 			title: {display: true, text: this.props.title},
 			scales: {

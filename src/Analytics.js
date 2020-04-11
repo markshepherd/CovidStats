@@ -6,7 +6,7 @@ class Analytics {
 	}
 
 	reportEvent(event, category, label) {
-		// console.log("Analytics", event, category, label);
+		console.log("Analytics", event, category, label);
 		if (this.enabled) {
 			// eslint-disable-next-line no-undef
 			gtag("event", event, {
@@ -19,30 +19,8 @@ class Analytics {
 		}
 	}
 
-	hideShowDatasetCount = 0;
-
-	reportHideShowDataset() {
-		this.hideShowDatasetCount += 1;
-		if (this.hideShowDatasetCount === 1) {
-			this.reportEvent("hideshow_dataset_1")
-		} else if (this.hideShowDatasetCount === 5) {
-			this.reportEvent("hideshow_dataset_5")
-		}
-	}
-
 	reportOutboundLink(url) {
 		this.reportEvent("click", "outbound", url);
-	}
-
-	dateSliderCount = 0;
-
-	dateSliderUsed() {
-		this.dateSliderCount += 1;
-		if (this.dateSliderCount === 1) {
-			this.reportEvent("date_slider_1")
-		} else if (this.dateSliderCount === 5) {
-			this.reportEvent("date_slider_5")
-		}
 	}
 
 	selectCount = {};
@@ -58,35 +36,36 @@ class Analytics {
 		}
 	}
 
-	linlogCount = 0;
+	counts = {
+		hideshow_dataset_click: 0,
+		date_slider_click: 0,
+		linlog_click: 0,
+		arrow_click: 0
+	};
 
-	linearLogToggleClicked() {
-		this.linlogCount += 1;
-		if (this.linlogCount === 1) {
-			this.reportEvent("linlog_click_1")
-		} else if (this.linlogCount === 5) {
-			this.reportEvent("linlog_click_5")
-		}
-	}
-
-	arrowCount = 0;
-
-	arrowClicked() {
-		this.arrowCount += 1;
-		if (this.arrowCount === 1) {
-			this.reportEvent("arrow_click_1")
-		} else if (this.arrowCount === 5) {
-			this.reportEvent("arrow_click_5")
-		}
-	}
-
-	countableEvent(counterName, eventName) {
-		this.counts[counterName] += 1;
-		if (this.counts[counterName] === 1) {
+	countableEvent(eventName) {
+		this.counts[eventName] += 1;
+		if (this.counts[eventName] === 1) {
 			this.reportEvent(`${eventName}_1`)
-		} else if (this.counts[counterName] === 5) {
+		} else if (this.counts[eventName] === 5) {
 			this.reportEvent(`${eventName}_5`)
 		}
+	}
+
+	hideShowDatasetClicked() {
+		this.countableEvent("hideshow_dataset_click");
+	}
+
+	dateSliderUsed() {
+		this.countableEvent("date_slider_click");
+	}
+
+	linearLogToggleClicked() {
+		this.countableEvent("linlog_click");
+	}
+
+	arrowClicked() {
+		this.countableEvent("arrow_click");
 	}
 
 	static instance;
