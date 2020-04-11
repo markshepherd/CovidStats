@@ -1,3 +1,16 @@
+This web page was created by Mark Shepherd using React, chart.js, and Material UI.
+
+The source code is at https://github.com/markshepherd/CovidStats.
+
+Many thanks to the New York Times for the data.
+
+Sorry for the clumsy code and primitive UI. I'm still learning... 😬.
+
+Following is boilerplate documenatation produced by tbe React framework's "Create React App" tool.
+
+----------
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
