@@ -193,11 +193,10 @@ class App extends React.Component {
 						</MyLink>
 						<br/>
 						<br/>
-                        <MyLink target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
-                             <img className="socialIcon"
-                                 align="right"
-                                 alt="Go to The Larkdales on Spotify"
-                                  src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
+                        <MyLink target="_blank" href="https://larkdales.com">
+	                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"
+	                        className="socialIcon" align="right" alt="Visit the Larkdales">
+                                 <path d="M26.451.526C12.155.526.565 12.116.565 26.412s11.59 25.886 25.886 25.886 25.886-11.59 25.886-25.886S40.748.526 26.451.526zM40.005 27.14h-2.689v9.918c0 .718-.026 1.299-1.014 1.299h-6.574V28.41h-6.554v9.947h-6.263c-1.295 0-1.326-.581-1.326-1.299V27.14h-2.689c-.96 0-1.206-.56-.547-1.244l12.903-12.915a1.659 1.659 0 012.399 0l12.902 12.915c.659.684.413 1.244-.548 1.244z"></path></svg>
                         </MyLink>
 					</div>
 					<div className="dateControl">
