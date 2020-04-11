@@ -189,6 +189,14 @@ class App extends React.Component {
 						 		alt="Go to Mark's Twitter"
 						  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
 						</MyLink>
+						<br/>
+						<br/>
+                        <MyLink target="_blank" href="https://open.spotify.com/album/7eAJ5qb0vFuN2K7iBrjbOu">
+                             <img className="socialIcon"
+                                 align="right"
+                                 alt="Go to The Larkdales on Spotify"
+                                  src={`${pathPrefix}Spotify_Icon_RGB_Green.svg`}/>
+                        </MyLink>
 					</div>
 					<div className="dateControl">
 						<span>Choose starting date of graph...</span>
