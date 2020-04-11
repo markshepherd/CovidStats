@@ -10,6 +10,7 @@ const radioStyle = {height: "25px"};
 class SeriesChart extends React.Component {
 	chartRef = React.createRef();
 	state = {type: "linear"};
+	datasetInitiallyHidden = [false, false, true, true];
 	
 	createChartData (series) {
 		var labels = [];
@@ -34,6 +35,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(75,75,192,0.5)',
 				borderWidth: 2,
 				fill: false,
+				hidden: this.datasetInitiallyHidden[0],
 				data: casesData
 			},
 			{
@@ -42,6 +44,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(75,150,75,0.5)',
 				borderWidth: 2,
 				fill: false,
+				hidden: this.datasetInitiallyHidden[1],
 				data: deathsData
 			},
 			{
@@ -50,7 +53,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(200,200,100,0.5)',
 				borderWidth: 2,
 				fill: false,
-				hidden: true,
+				hidden: this.datasetInitiallyHidden[2],
 				data: cumulativeCasesData
 			},
 			{
@@ -59,7 +62,7 @@ class SeriesChart extends React.Component {
 				borderColor: 'rgba(100,30,30,0.5)',
 				borderWidth: 2,
 				fill: false,
-				hidden: true,
+				hidden: this.datasetInitiallyHidden[3],
 				data: cumulativeDeathsData
 			}]
 		};
@@ -76,7 +79,14 @@ class SeriesChart extends React.Component {
 	}
 
 	handleChartClick = () => {
-		console.log("chartclick");
+		setTimeout(() => {
+			for (var i = 0; i < this.datasetInitiallyHidden.length; i += 1) {
+				const hidden = !this.chartRef.current.chartInstance.isDatasetVisible(i);
+				if (hidden !== this.datasetInitiallyHidden[i]) {
+					Analytics.reportHideShowDataset();
+				}
+			}
+		}, 500)
 	}
 
 	render() {
@@ -86,7 +96,10 @@ class SeriesChart extends React.Component {
 			},
 			responsive: true,
 			maintainAspectRatio: true,
-			/* onResize: (x) => console.log("resize", x), */
+			onClick: this.handleChartClick,
+			// onResize: (x) => console.log("resize", x), */
+			// onComplete: (e) => {console.log("chart onComplete", e);},
+			// onHover: (e) => {if (e.type !== "mousemove") {console.log("chart onHover", e);}},
 			legend: {position: 'top'},
 			title: {display: true, text: this.props.title},
 			scales: {
@@ -112,7 +125,7 @@ class SeriesChart extends React.Component {
 		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
 		        </RadioGroup>
 			</div>
-			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)} onClick={this.handleChartClick}/>}
+			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
 		</div>);
 	}
 }	

@@ -1,14 +1,33 @@
 class Analytics {
+	enabled = true;
+
+	enable(enabled) {
+		this.enabled = enabled;
+	}
+
 	reportEvent(event, category, label) {
 		// console.log("Analytics", event, category, label);
-		// eslint-disable-next-line no-undef
-		gtag("event", event, {
-			event_category: category || "engagement",
-			event_label: label,
-			transport_type: "beacon"			
-		});
-		// BTW, setting the transport method to "beacon" lets the hit be sent
-		// using "navigator.sendBeacon" in browsers that support it.
+		if (this.enabled) {
+			// eslint-disable-next-line no-undef
+			gtag("event", event, {
+				event_category: category || "engagement",
+				event_label: label,
+				transport_type: "beacon"			
+			});
+			// BTW, setting the transport method to "beacon" lets the hit be sent
+			// using "navigator.sendBeacon" in browsers that support it.
+		}
+	}
+
+	hideShowDatasetCount = 0;
+
+	reportHideShowDataset() {
+		this.hideShowDatasetCount += 1;
+		if (this.hideShowDatasetCount === 1) {
+			this.reportEvent("hideshow_dataset_1")
+		} else if (this.hideShowDatasetCount === 5) {
+			this.reportEvent("hideshow_dataset_5")
+		}
 	}
 
 	reportOutboundLink(url) {
@@ -58,6 +77,15 @@ class Analytics {
 			this.reportEvent("arrow_click_1")
 		} else if (this.arrowCount === 5) {
 			this.reportEvent("arrow_click_5")
+		}
+	}
+
+	countableEvent(counterName, eventName) {
+		this.counts[counterName] += 1;
+		if (this.counts[counterName] === 1) {
+			this.reportEvent(`${eventName}_1`)
+		} else if (this.counts[counterName] === 5) {
+			this.reportEvent(`${eventName}_5`)
 		}
 	}
 

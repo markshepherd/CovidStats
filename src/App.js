@@ -9,12 +9,13 @@ import CovidData from './CovidData';
 import Analytics from './Analytics';
 import MyLink from './MyLink';
 
-const development = false;
+const development = true;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
 const dataDate = "4-10-20";
 const uiDate = "Apr 10, 2020"
+Analytics.enable(!development);
 
 const MyTooltip = withStyles((theme) => ({
   tooltip: {
