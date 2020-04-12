@@ -1,18 +1,68 @@
 import React from 'react';
-import {Line} from 'react-chartjs-2';
-import { FormControlLabel, Radio, RadioGroup } from '@material-ui/core';
+import { Line } from 'react-chartjs-2';
+import { Checkbox, FormControlLabel, Radio, RadioGroup, Slider } from '@material-ui/core';
 import Analytics from './Analytics';
-
-const buttonsStyle = {position: "absolute", left: "10px", top: "5px"};
+import "./App.css";
+const linLogStyle = {position: "absolute", left: "10px", top: "5px"};
+const checkboxesStyle = {position: "absolute", left: "105px", top: "25px"};
 const containerStyle = {position: "relative", top: "0px"};
-const radioStyle = {height: "25px"};
+const radioStyle = {height: "23px"};
+const sliderStyle = {position: "absolute", left: "210px", top: "2px", width: "60px"};
+const sliderLabelStyle = {position: "absolute", left: "105px", top: "6px"};
+
 
 class SeriesChart extends React.Component {
-	chartRef = React.createRef();
-	state = {type: "linear"};
-	datasetInitiallyHidden = [false, false, true, true];
-	
-	createChartData (series) {
+	constructor (props) {
+		super(props);
+		this.chartRef = React.createRef();
+		this.state = {type: "linear", movingAverageDays: 1, cumulative: false, smooth: false};
+		this.datasets = [];
+	}
+
+	calcMovingAverage(array, number) {
+		var half = Math.floor(this.state.movingAverageDays / 2);
+		var result = [];
+		var i;
+		for (i = 0; i < half; i += 1) {
+			result.push(array[i]);
+		}
+		for (i = half; i < array.length; i += 1) {
+			var sum = 0;
+			for (var j = 0; j < number; j += 1) {
+				var ind = Math.min(array.length - 1, i + half - j);
+				sum += array[ind];
+			}
+			result.push(sum / number);
+		}
+		return result;
+	}
+
+	isHidden = {
+		0: false,
+		1: false,
+		2: false,
+		3: false,
+		4: false,
+		5: false
+	};
+
+	findMin(array) {
+		let min = Number.POSITIVE_INFINITY;
+		for (let i = 0; i < array.length; i += 1) {
+			min = Math.min(min, array[i]);
+		}
+		return min;
+	}
+
+	findMax(array) {
+		let max = Number.NEGATIVE_INFINITY;
+		for (let i = 0; i < array.length; i += 1) {
+			max = Math.max(max, array[i]);
+		}
+		return max;
+	}
+
+	createChartData (series, cumulative, smooth) {
 		var labels = [];
 		var casesData = [];
 		var deathsData = [];
@@ -27,45 +77,94 @@ class SeriesChart extends React.Component {
 			cumulativeDeathsData.push(item.cumulativeDeaths);
 		}
 
-		return {
-			labels: labels,
-			datasets: [{
-				label: 'Daily New Cases',
-				backgroundColor: "000000",
-				borderColor: 'rgba(75,75,192,0.5)',
-				borderWidth: 2,
-				fill: false,
-				hidden: this.datasetInitiallyHidden[0],
-				data: casesData
-			},
-			{
-				label: 'Daily Deaths',
-				backgroundColor: "#333333",
-				borderColor: 'rgba(75,150,75,0.5)',
-				borderWidth: 2,
-				fill: false,
-				hidden: this.datasetInitiallyHidden[1],
-				data: deathsData
-			},
-			{
-				label: 'Cumulative Cases',
-				backgroundColor: "#333333",
-				borderColor: 'rgba(200,200,100,0.5)',
-				borderWidth: 2,
-				fill: false,
-				hidden: this.datasetInitiallyHidden[2],
-				data: cumulativeCasesData
-			},
-			{
-				label: 'Cumulative Deaths',
-				backgroundColor: "#333333",
-				borderColor: 'rgba(100,30,30,0.5)',
-				borderWidth: 2,
-				fill: false,
-				hidden: this.datasetInitiallyHidden[3],
-				data: cumulativeDeathsData
-			}]
-		};
+		const datasetLabels = [
+			"Cumulative Cases", "Cumulative Deaths", "Daily New Cases", 
+			`Daily New Cases ${this.state.movingAverageDays}-day Average`, "Daily Deaths",
+			`Daily Deaths ${this.state.movingAverageDays}-day Average`];
+
+		this.minY = undefined;
+		this.maxY = undefined;
+
+		if (cumulative) {
+			this.datasets = [
+				{
+					myId: 0,
+					label: datasetLabels[0],
+					backgroundColor: "#333333",
+					borderColor: 'rgba(75,75,192,0.5)',
+					borderWidth: 2,
+					fill: false,
+					hidden: this.isHidden[0],
+					data: cumulativeCasesData
+				},
+				{
+					myId: 1,
+					label: datasetLabels[1],
+					backgroundColor: "#333333",
+					borderColor: 'rgba(75,150,75,0.5)',
+					borderWidth: 2,
+					fill: false,
+					hidden: this.isHidden[1],
+					data: cumulativeDeathsData
+				}
+			];
+
+		} else if (smooth) {
+			this.datasets = [
+				{
+					myId: 3,
+					label: datasetLabels[3],
+					backgroundColor: "#aaaaaa",
+					borderColor: 'rgba(75,75,192,0.3)',
+					borderWidth: 4,
+					fill: false,
+					hidden: this.isHidden[3],
+					data: this.calcMovingAverage(casesData, this.state.movingAverageDays),
+					origData: casesData
+				},			
+				{
+					myId: 5,
+					label: datasetLabels[5],
+					borderColor: 'rgba(75,150,75,0.3)',
+					borderWidth: 4,
+					fill: false,
+					hidden: this.isHidden[5],
+					data: this.calcMovingAverage(deathsData, this.state.movingAverageDays),
+					origData: deathsData
+				}
+			];
+
+			if (!this.isHidden[3] && !this.isHidden[5]) {
+				this.minY = Math.min(this.findMin(casesData), this.findMin(deathsData));
+				this.maxY = Math.max(this.findMax(casesData), this.findMax(deathsData));
+			}
+
+		} else {
+			this.datasets = [
+				{
+					myId: 2,
+					label: datasetLabels[2],
+					backgroundColor: "#aaaaaa",
+					borderColor: 'rgba(75,75,192,0.7)',
+					borderWidth: 2,
+					fill: false,
+					hidden: this.isHidden[2],
+					data: casesData
+				},
+				{
+					myId: 4,
+					label: datasetLabels[4],
+					backgroundColor: "#aaaaaa",
+					borderColor: 'rgba(75,150,75,0.7)',
+					borderWidth: 2,
+					fill: false,
+					hidden: this.isHidden[4],
+					data: deathsData
+				}
+			];
+		}
+
+		return {labels: labels, datasets: this.datasets};
 	}
 
 	handleLinearClick = () => {
@@ -78,27 +177,39 @@ class SeriesChart extends React.Component {
 		this.setState({type: "logarithmic"});
 	}
 
+	handleCumulativeChange = (event) => {
+		this.setState({cumulative: event.target.checked});
+	}
+
 	handleChartClick = () => {
 		setTimeout(() => {
-			for (var i = 0; i < this.datasetInitiallyHidden.length; i += 1) {
+			for (var i = 0; i < this.datasets.length; i += 1) {
 				const hidden = !this.chartRef.current.chartInstance.isDatasetVisible(i);
-				if (hidden !== this.datasetInitiallyHidden[i]) {
+				if (hidden !== this.isHidden[this.datasets[i].myId]) {
 					Analytics.hideShowDatasetClicked();
+					this.isHidden[this.datasets[i].myId] = hidden;
 				}
 			}
-		}, 500)
+		}, 200)
+	}
+
+	handleSliderChanged = (e, value) => {
+		this.setState({movingAverageDays: value, smooth: value !== 1});
 	}
 
 	render() {
+		const chartData = this.props.series && this.createChartData(
+			this.props.series, this.state.cumulative, this.state.smooth);
+
 	    const options = {
 			animation: {
-				duration: 300
+				duration: 0
 			},
 			responsive: true,
 			maintainAspectRatio: true,
-			onClick: this.handleChartClick, // there is also onResize, onComplete, onHover
+			onClick: this.handleChartClick, // FYI there is also onResize, onComplete, onHover, before/afterUpdate
 			legend: {position: 'top'},
-			title: {display: true, text: this.props.title},
+			title: {display: true, text: this.props.title, fontSize: "16"},
 			scales: {
 				xAxes: [{
 					display: true
@@ -107,6 +218,8 @@ class SeriesChart extends React.Component {
 					display: true,
 					type: this.state.type,
 					ticks: {
+						suggestedMin: this.minY, // minY and maxY are computed by createChartData()
+						suggestedMax: this.maxY,
 						callback: function(value, index, values) {
 							return value;
 						}
@@ -116,13 +229,27 @@ class SeriesChart extends React.Component {
 		};
 
 		return (<div style={containerStyle}>
-			<div style={buttonsStyle}>
+			<div style={linLogStyle}>
 		        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
-		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
-		          <FormControlLabel control={<Radio color="default"/>} size="small" style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
+		          <FormControlLabel control={<Radio color="default" size="small"/>} style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
+		          <FormControlLabel control={<Radio color="default" size="small"/>} style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
 		        </RadioGroup>
 			</div>
-			{this.props.series && <Line ref={this.chartRef} options={options} data={this.createChartData(this.props.series)}/>}
+			<div style={checkboxesStyle}>
+				<FormControlLabel control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" style={{fontSize: "4px"}} onChange={this.handleCumulativeChange}/>
+			</div>
+			<span style={sliderLabelStyle} disabled={this.state.cumulative}>Smoothing:</span>
+			<Slider
+				style={sliderStyle}
+				disabled={this.state.cumulative}
+				min={1}
+				max={5}
+				step={2}
+				track="inverted"
+				defaultValue={1}
+				onChange={this.handleSliderChanged}
+			/>
+			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
 		</div>);
 	}
 }	
