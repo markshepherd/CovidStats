@@ -1,0 +1,32 @@
+
+.tableRoot {
+  position: relative;
+  height: 100%;
+  max-height: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 25px;
+  grid-template-areas: 
+    "arrows"
+    "table";
+}
+
+.forwardBackButtons {
+  grid-area: arrows;
+  justify-self: center;  
+}
+
+.tableContainer {
+  grid-area: table;
+  border-radius: 10px;
+  min-height: 0;
+  height: 100%;
+}
+
+.color1 {
+  background-color: #ffffe0;
+}
+
+.color2 {
+  background-color: #fffff4;
+}

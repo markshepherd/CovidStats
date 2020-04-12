@@ -9,24 +9,14 @@ import {
 	TableContainer
 } from '@material-ui/core';
 import Analytics from './Analytics';
-import './App.css';
-
+import './RegionTable.css';
 
 const slimStyle = {height: "0px", padding: "0px"};
-const buttonsStyle = {position: "relative", left: "70px", fontSize: "20px"};
-const regionTableStyle = {
-   	height: "400px",
-    maxHeight: "400px",
-    marginLeft: "10px",
-    marginRight: "10px",
-	borderRadius: "10px"
-};
 
 export default class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
 		this.selectedIndex = 0;
-		this.style = Object.assign({backgroundColor: props.backgroundColor}, regionTableStyle);
 		this.state = {
 			selection: this.props.list[this.selectedIndex].name,
 			list: this.createSortedList("cases", false), 
@@ -135,6 +125,7 @@ export default class RegionTable extends React.Component {
 		}
 	}
 
+
 	listsEqual(a, b) {
 		return (a.length === b.length) && (a.length === 0 || (a[0].name === b[0].name));
 	}
@@ -156,16 +147,17 @@ export default class RegionTable extends React.Component {
 	}
 
 	render() {
-		return (<div>
-			<div style={buttonsStyle}>
+		var tableClasses = `tableContainer ${this.props.extra}`;
+		return (<div className="tableRoot">
+			<div className="forwardBackButtons">
 				<Link href="#" onClick={this.handlePrevClick}>◀</Link>
 				&nbsp;
 				<Link href="#" onClick={this.handleNextClick}>▶</Link>
 			</div>
-			<TableContainer ref={this.tableContainerRef} style={this.style}>
+			<TableContainer ref={this.tableContainerRef} className={tableClasses}>
 				<Table stickyHeader style={slimStyle} size="small">
 					<TableHead>
-            			<TableRow style={slimStyle}>
+            			<TableRow>
               				<TableCell style={slimStyle} onClick={this.toggleSort} align="left">{this.props.title}{this.state.sortBy === "name" ? "▲" : ""}</TableCell>
               				<TableCell style={slimStyle} onClick={this.toggleSort} align="right">{this.state.sortBy === "cases" ? "▼" : ""}Cases</TableCell>
             			</TableRow>            
@@ -175,7 +167,7 @@ export default class RegionTable extends React.Component {
 	  					{this.state.list.map((item) => {
 	  						var selected = item.name === this.state.selection;
 
-					  		return <TableRow ref={selected ? this.selectedRef : null} selected={selected} style={slimStyle} key={item.name} onClick={this.props.itemClick}>
+					  		return <TableRow ref={selected ? this.selectedRef : null} selected={selected} key={item.name} onClick={this.props.itemClick}>
 								<TableCell style={slimStyle} align="left" onClick={(e) => this.handleCellClick(e, item.name)}>{item.name}</TableCell>
 								<TableCell style={slimStyle} align="right" onClick={(e) => this.handleCellClick(e, item.name)}>{item.cases}</TableCell>
 				  			</TableRow>

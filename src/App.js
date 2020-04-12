@@ -9,7 +9,9 @@ import CovidData from './CovidData';
 import Analytics from './Analytics';
 import MyLink from './MyLink';
 
-const development = false;
+import './App.css';
+
+const development = true;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
@@ -49,6 +51,7 @@ const FormatSliderValue = props => {
   );
 };
 
+
 class App extends React.Component {
 	/* this.state = 
 		{
@@ -61,6 +64,7 @@ class App extends React.Component {
 	*/
 
 	constructor(props) {	
+		console.log(window.outerHeight, window.innerHeight);
 		super(props);
 		this.state = {startDate: "2020-03-01"};
 		this.calcStatesList = this.calcStatesList.bind(this);		
@@ -166,12 +170,13 @@ class App extends React.Component {
 					Last updated {uiDate}.
 				</div>
 
+
 				{this.state.statesList && <div className="state">
-					<RegionTable backgroundColor="#ffffe0" title="State"
+					<RegionTable extra="color1" title="State"
 						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
 
 				{this.state.selectedState && <div className="county">
-					<RegionTable backgroundColor="#fffff4" title="County"
+					<RegionTable extra="color2" title="County"
 						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
 						onSelected={this.handleCountySelected}/></div>}
 
@@ -204,6 +209,7 @@ class App extends React.Component {
                                  <path d="M26.451.526C12.155.526.565 12.116.565 26.412s11.59 25.886 25.886 25.886 25.886-11.59 25.886-25.886S40.748.526 26.451.526zM40.005 27.14h-2.689v9.918c0 .718-.026 1.299-1.014 1.299h-6.574V28.41h-6.554v9.947h-6.263c-1.295 0-1.326-.581-1.326-1.299V27.14h-2.689c-.96 0-1.206-.56-.547-1.244l12.903-12.915a1.659 1.659 0 012.399 0l12.902 12.915c.659.684.413 1.244-.548 1.244z"></path></svg>
                         </MyLink>
 					</div>
+
 					<div className="dateControl">
 						<span>Choose starting date of graph...</span>
 						{this.state.dateList && <Slider

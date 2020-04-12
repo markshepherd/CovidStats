@@ -2,14 +2,7 @@ import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { Checkbox, FormControlLabel, Radio, RadioGroup, Slider } from '@material-ui/core';
 import Analytics from './Analytics';
-import "./App.css";
-const linLogStyle = {position: "absolute", left: "10px", top: "5px"};
-const checkboxesStyle = {position: "absolute", left: "105px", top: "25px"};
-const containerStyle = {position: "relative", top: "0px"};
-const radioStyle = {height: "23px"};
-const sliderStyle = {position: "absolute", left: "210px", top: "2px", width: "60px"};
-const sliderLabelStyle = {position: "absolute", left: "105px", top: "6px"};
-
+import "./SeriesChart.css";
 
 class SeriesChart extends React.Component {
 	constructor (props) {
@@ -228,31 +221,30 @@ class SeriesChart extends React.Component {
 			}
 		};
 
-		return (<div style={containerStyle}>
-			<div style={linLogStyle}>
-		        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
-		          <FormControlLabel control={<Radio color="default" size="small"/>} style={radioStyle} value="linear" label="Linear" onClick={this.handleLinearClick}/>
-		          <FormControlLabel control={<Radio color="default" size="small"/>} style={radioStyle} value="logarithmic" label="Log" onClick={this.handleLogClick}/>
-		        </RadioGroup>
+		return (<div className="chartRoot">
+			<div className="chartControls">
+				<div className="linlog">
+			        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
+			          <FormControlLabel control={<Radio color="default" size="small"/>} className="radio" value="linear" label="Linear" onClick={this.handleLinearClick}/>
+			          <FormControlLabel control={<Radio color="default" size="small"/>} className="radio" value="logarithmic" label="Log" onClick={this.handleLogClick}/>
+			        </RadioGroup>
+				</div>
+				<FormControlLabel className="checkbox" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChange}/>
+				<span className="label" disabled={this.state.cumulative}>Smoothing:</span>
+				<Slider
+					className="slider"
+					disabled={this.state.cumulative}
+					min={1}
+					max={5}
+					step={2}
+					track="inverted"
+					defaultValue={1}
+					onChange={this.handleSliderChanged}
+				/>
 			</div>
-			<div style={checkboxesStyle}>
-				<FormControlLabel control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" style={{fontSize: "4px"}} onChange={this.handleCumulativeChange}/>
-			</div>
-			<span style={sliderLabelStyle} disabled={this.state.cumulative}>Smoothing:</span>
-			<Slider
-				style={sliderStyle}
-				disabled={this.state.cumulative}
-				min={1}
-				max={5}
-				step={2}
-				track="inverted"
-				defaultValue={1}
-				onChange={this.handleSliderChanged}
-			/>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
-		</div>);
+		</div>)
 	}
 }	
 
 export default SeriesChart;
-

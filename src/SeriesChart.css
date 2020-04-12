@@ -1,0 +1,40 @@
+
+.chartRoot {
+  position: relative;
+}
+
+.chartControls {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  display: grid;
+  grid-template-columns: 100px 105px 60px;
+  grid-template-rows: 30px 20px;
+  grid-template-areas: 
+    "linlog label    slider"
+    "linlog checkbox checkbox";
+}
+
+.linlog {
+  grid-area: linlog;
+  height: 23px;  
+}
+
+.label {
+  margin-top: 2px;
+  grid-area: label;
+}
+
+.slider {
+  margin-top: -2px;
+  grid-area: slider;
+}
+
+.checkbox {
+  margin-top: -5px;
+  grid-area: checkbox;
+}
+
+.radio {
+  height: 25px;
+}
