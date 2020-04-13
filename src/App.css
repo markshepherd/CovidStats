@@ -2,16 +2,36 @@
 
 .app {
   display: grid;
+  grid-gap: 10px;
+  height: 100%;
+  max-height: 100%;
+  min-height: 100%;
+}
+
+/* iPhone 6, 7, 8 -----------
+@media only screen and (min-device-width: 375px) and (max-device-height: 667px) 
+and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
+}
+*/
+
+@media only screen and (min-width: 1200px) {
+ .app {
   grid-template-columns: 200px 200px 1fr;
   grid-template-rows: 55px minmax(200px, 1000px) 120px;
   grid-template-areas: 
     "header header header"
     "states counties chart"
     "notes  notes    chart";
-  grid-gap: 10px;
-  height: 100%;
-  max-height: 100%;
-  min-height: 100%;
+}
+}
+
+@media only screen and (max-width: 1199px) {
+ .app {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: 
+    "chart";
+}
 }
 
 .state {
@@ -50,7 +70,7 @@
   margin-left: 10px;
   margin-bottom: 10px;
   flex: auto;
-  min-width: 0;
+  min-width: 600px;
   background-color: #cceeee;
   margin-right: 10px;
   border-radius: 15px;

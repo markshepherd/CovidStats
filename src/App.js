@@ -11,7 +11,7 @@ import MyLink from './MyLink';
 
 import './App.css';
 
-const development = true;
+const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
@@ -64,9 +64,7 @@ class App extends React.Component {
 	*/
 
 	constructor(props) {	
-		console.log(window.outerHeight, window.innerHeight);
 		super(props);
-		this.state = {startDate: "2020-03-01"};
 		this.calcStatesList = this.calcStatesList.bind(this);		
 		this.calcCountiesList = this.calcCountiesList.bind(this);		
 		this.handleStateSelected = this.handleStateSelected.bind(this);		
@@ -74,6 +72,13 @@ class App extends React.Component {
 		this.handleSliderChanged = this.handleSliderChanged.bind(this);	
 		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
 		this.trimToStartDate = this.trimToStartDate.bind(this);	
+		this.mql = window.matchMedia("(max-width: 1199px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
+		this.mql.addListener(() => {
+			this.setState({small: this.mql.matches});
+		});
+		this.state = {startDate: "2020-03-01", small: this.mql.matches,
+			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
+		console.log("small", this.state.small);
 	}
 
 	calcStatesList(statesData) {
@@ -164,28 +169,27 @@ class App extends React.Component {
 
 		return (
 			<div className="app"> 
-				<div className="header">
+				{!this.state.small && <div className="header">
 					<span className="myheader">Covid-19 Statistics by U.S. State and County</span>
 					<br/>
 					Last updated {uiDate}.
-				</div>
+				</div>}
 
-
-				{this.state.statesList && <div className="state">
+				{!this.state.small && this.state.statesList && <div className="state">
 					<RegionTable extra="color1" title="State"
 						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
 
-				{this.state.selectedState && <div className="county">
+				{!this.state.small && this.state.statesData && this.state.selectedState && <div className="county">
 					<RegionTable extra="color2" title="County"
 						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
 						onSelected={this.handleCountySelected}/></div>}
 
-				{this.state.selectedCounty && <div className="chart">
+				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
 						title={title}
 						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/></div>}
 
-				<div className="notes">
+				{!this.state.small && <div className="notes">
 					<div className="notesText">
 						<p>Created by 
 						<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
@@ -225,7 +229,7 @@ class App extends React.Component {
   							ValueLabelComponent={FormatSliderValue}
 						/>}
 					</div>
-				</div>
+				</div>}
 			</div>);
 	}
 }
