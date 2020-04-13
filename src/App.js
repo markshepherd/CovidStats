@@ -1,7 +1,8 @@
 import React from 'react';
-import { Slider, Tooltip } from '@material-ui/core';
+import { FormControl, Link, MenuItem, Select, Slider, Tooltip } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { useEffect, useRef } from "react";
+
 
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
@@ -11,7 +12,7 @@ import MyLink from './MyLink';
 
 import './App.css';
 
-const development = false;
+const development = true;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
@@ -76,7 +77,9 @@ class App extends React.Component {
 		this.mql.addListener(() => {
 			this.setState({small: this.mql.matches});
 		});
-		this.state = {startDate: "2020-03-01", small: this.mql.matches,
+		var small = this.mql.matches;
+		//var small = false;
+		this.state = {startDate: "2020-03-01", small: small,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
 		console.log("small", this.state.small);
 	}
@@ -133,6 +136,14 @@ class App extends React.Component {
 		Analytics.dateSliderUsed();
 	}
 
+	handleStateSelectChanged = (e) => {
+		this.handleStateSelected(e.currentTarget.textContent);
+	}
+
+	handleCountySelectChanged = (e) => {
+		this.handleCountySelected(e.currentTarget.textContent);
+	}
+
 	findDateIndex(date) {
 		var result = this.state.dateList.findIndex((element) => { 
 			var x = element === date;
@@ -162,10 +173,68 @@ class App extends React.Component {
 		return series;
 	}
 
+	findSelectedCountyIndex() {
+		for (var i = 0; i < this.countiesList.length; i += 1) {
+			if (this.countiesList[i].name === this.state.selectedCounty) {
+				return i;
+			}
+ 		}
+	}
+	
+	findSelectedStateIndex() {
+		for (var i = 0; i < this.state.statesList.length; i += 1) {
+			if (this.state.statesList[i].name === this.state.selectedState) {
+				return i;
+			}
+ 		}
+	}
+
+	handleCountyDownClick = (e) => {
+		let index = this.findSelectedCountyIndex();
+		if (index < this.countiesList.length - 1) {
+			index += 1;
+		}
+		this.handleCountySelected(this.countiesList[index].name);
+		Analytics.arrowClicked();
+	}
+
+	handleCountyUpClick = (e) => {
+		let index = this.findSelectedCountyIndex();
+		if (index > 0) {
+			index -= 1;
+		}
+		this.handleCountySelected(this.countiesList[index].name);
+		Analytics.arrowClicked();
+	}
+
+	handleStateDownClick = (e) => {
+		let index = this.findSelectedStateIndex();
+		if (index < this.state.statesList.length - 1) {
+			index += 1;
+		}
+		this.handleStateSelected(this.state.statesList[index].name);
+		Analytics.arrowClicked();
+	}
+
+	handleStateUpClick = (e) => {
+		let index = this.findSelectedStateIndex();
+		if (index > 0) {
+			index -= 1;
+		}
+		this.handleStateSelected(this.state.statesList[index].name);
+		Analytics.arrowClicked();
+	}
+
 	render() {
-		var title = (this.state.selectedCounty === CovidData.allCounties) 
-			? this.state.selectedState + "," + this.state.selectedCounty
-			: this.state.selectedState + ", " + this.state.selectedCounty + " county";
+		const chartTitle = this.state.small
+			? ""
+			: (this.state.selectedCounty === CovidData.allCounties) 
+				? this.state.selectedState + "," + this.state.selectedCounty
+				: this.state.selectedState + ", " + this.state.selectedCounty + " county";
+
+		if (this.state.statesData && this.state.selectedState) {
+			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
+		}
 
 		return (
 			<div className="app"> 
@@ -181,13 +250,53 @@ class App extends React.Component {
 
 				{!this.state.small && this.state.statesData && this.state.selectedState && <div className="county">
 					<RegionTable extra="color2" title="County"
-						list={this.calcCountiesList(this.state.statesData, this.state.selectedState)}
+						list={this.countiesList}
 						onSelected={this.handleCountySelected}/></div>}
 
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
-						title={title}
+						title={chartTitle}
 						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/></div>}
+
+				{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
+					<FormControl>
+				        <Select
+				        	className="stateMenu"
+				        	labelId="demo-simple-select-label"
+				        	id="demo-simple-select"
+				        	value={this.state.selectedState}
+				        	onChange={this.handleStateSelectChanged}
+				        >
+				        	{this.state.statesList.map((item) => {
+								return <MenuItem value={item.name}>{item.name}</MenuItem>
+						    })}
+				        </Select>
+				    </FormControl>
+				    <div className="stateUpDownButtons">
+						<Link href="#" onClick={this.handleStateUpClick} className="updown">▲</Link>
+						<Link href="#" onClick={this.handleStateDownClick} className="updown">▼</Link>
+					</div>
+				</div>}
+
+				{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
+					<FormControl>
+				        <Select
+				        	className="countyMenu"
+				        	labelId="demo-simple-select-label2"
+				        	id="demo-simple-select2"
+				        	value={this.state.selectedCounty}
+				        	onChange={this.handleCountySelectChanged}
+				        >
+				        	{this.countiesList.map((item) => {
+								return <MenuItem value={item.name}>{item.name}</MenuItem>
+						    })}
+				        </Select>
+				    </FormControl>
+				    <div className="countyUpDownButtons">
+						<Link href="#" onClick={this.handleCountyUpClick} className="updown">▲</Link>
+						<Link href="#" onClick={this.handleCountyDownClick} className="updown">▼</Link>
+					</div>
+				</div>}
 
 				{!this.state.small && <div className="notes">
 					<div className="notesText">

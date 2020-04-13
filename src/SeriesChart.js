@@ -1,6 +1,6 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { Checkbox, FormControlLabel, Radio, RadioGroup, Slider } from '@material-ui/core';
+import { Checkbox, FormControlLabel, Slider, Typography } from '@material-ui/core';
 import Analytics from './Analytics';
 import "./SeriesChart.css";
 
@@ -160,14 +160,9 @@ class SeriesChart extends React.Component {
 		return {labels: labels, datasets: this.datasets};
 	}
 
-	handleLinearClick = () => {
+	handleLogChanged = () => {
 		Analytics.linearLogToggleClicked();
-    	this.setState({type: "linear"});
-	}
-
-	handleLogClick = () => {
-		Analytics.linearLogToggleClicked();
-		this.setState({type: "logarithmic"});
+		this.setState({type: (this.state.type === "logarithmic") ? "linear" : "logarithmic"});
 	}
 
 	handleCumulativeChange = (event) => {
@@ -220,28 +215,23 @@ class SeriesChart extends React.Component {
 				}]
 			}
 		};
-
+		
 		return (<div className="chartRoot">
-			<div className="chartControls">
-				<div className="linlog">
-			        <RadioGroup value={this.state.type} onChange={this.handleRadioChange}>
-			          <FormControlLabel control={<Radio color="default" size="small"/>} className="radio" value="linear" label="Linear" onClick={this.handleLinearClick}/>
-			          <FormControlLabel control={<Radio color="default" size="small"/>} className="radio" value="logarithmic" label="Log" onClick={this.handleLogClick}/>
-			        </RadioGroup>
+				<div className="chartControls">
+					<FormControlLabel className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
+					<FormControlLabel className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChange}/>
+					<Typography className="label" disabled={this.state.cumulative}>Smooth</Typography>
+					<Slider
+						className="slider"
+						disabled={this.state.cumulative}
+						min={1}
+						max={5}
+						step={2}
+						track="inverted"
+						defaultValue={1}
+						onChange={this.handleSliderChanged}
+					/>
 				</div>
-				<FormControlLabel className="checkbox" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChange}/>
-				<span className="label" disabled={this.state.cumulative}>Smoothing:</span>
-				<Slider
-					className="slider"
-					disabled={this.state.cumulative}
-					min={1}
-					max={5}
-					step={2}
-					track="inverted"
-					defaultValue={1}
-					onChange={this.handleSliderChanged}
-				/>
-			</div>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
 		</div>)
 	}

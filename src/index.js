@@ -4,10 +4,16 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import 'typeface-roboto';
+import { ThemeProvider } from '@material-ui/core';
+import { createMuiTheme } from '@material-ui/core/styles';
+
+const theme = createMuiTheme({typography: {fontSize: 12}});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+  	<ThemeProvider theme={theme}>
+	    <App />
+	</ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
