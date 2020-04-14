@@ -125,7 +125,6 @@ export default class RegionTable extends React.Component {
 		}
 	}
 
-
 	listsEqual(a, b) {
 		return (a.length === b.length) && (a.length === 0 || (a[0].name === b[0].name));
 	}

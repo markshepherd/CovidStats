@@ -1,7 +1,7 @@
 
 .chartRoot {
   position: relative;
-  background-color: #cceeee;
+  background-color: #fafafa;
   border-radius: 15px;
 }
 
@@ -11,10 +11,11 @@
   left: 10px;
   display: grid;
   grid-template-columns: 70px 60px;
-  grid-template-rows: 30px 20px;
+  grid-template-rows: 19px 19px 19px;
   grid-template-areas: 
-    "log   cumulative"
-    "label slider";
+    "label slider"
+    "cumulative cumulative"
+    "log log"
 }
 
 .log {
@@ -36,6 +37,18 @@
   grid-area: cumulative;
 }
 
-.MuiFormControlLabel-label {
-  font-size: 8px;
+.appTitle {
+  position: absolute;
+  top: -4px;
+  left: 100px;
+  width: 200px;
+  text-align: center;
+}
+
+.updateDate {
+  position: absolute;
+  top: 18px;
+  left: 100px;
+  width: 200px;
+  text-align: center;
 }

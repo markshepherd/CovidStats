@@ -6,6 +6,7 @@
   height: 100%;
   max-height: 100%;
   min-height: 100%;
+  min-width: 638px;
 }
 
 /* iPhone 6, 7, 8 -----------
@@ -14,18 +15,35 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
 }
 */
 
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 1000px) {
  .app {
-  grid-template-columns: 200px 200px 1fr;
+  grid-template-columns: 160px 160px 1fr;
   grid-template-rows: 55px minmax(200px, 1000px) 120px;
   grid-template-areas: 
     "header header header"
     "states counties chart"
     "notes  notes    chart";
 }
+
+.chart {
+  margin-top: 25px;
+}
 }
 
-@media only screen and (max-width: 1199px) {
+/*
+@media only screen and (min-width: 1200px) {
+ .app {
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 55px 1fr 1fr;
+  grid-template-areas: 
+    "header header"
+    "states chart"
+    "counties notes"
+}
+}
+*/
+
+@media only screen and (max-width: 999px) {
  .app {
   grid-template-columns: 1fr;
   grid-template-rows: 1fr;
@@ -41,11 +59,12 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
   margin-left: 10px;
 }
 
+
 .county {
   grid-area: counties;
   min-height: 0;
   max-height: 100%;
-  margin-left: 5px;
+  margin-left: 0px;
 }
 
 .notes {
@@ -67,55 +86,23 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
 
 .chart {
   grid-area: chart;
-  margin-left: 10px;
   margin-bottom: 10px;
   flex: auto;
-  min-width: 615px;
-  margin-right: 10px;
+  min-width: 638px;
+  position: relative;  
 }
 
-/* controls for small mode */
+/* alternate styles for the small app size */
 
 .stateSelector {
   position: absolute;
-  left: 250px;
+  right: 210px;
   top: 5px;
 }
-
 .countySelector {
   position: absolute;
-  left: 450px;
+  right: 40px;
   top: 5px;
-}
-
-.stateMenu {
-  width: 150px;
-}
-
-.countyMenu {
-  width: 150px;
-}
-
-.countyUpDownButtons {
-  position: absolute;
-  left: 155px;
-  top: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.stateUpDownButtons {
-  position: absolute;
-  left: 155px;
-  top: 5px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;  
-}
-
-.updown {
-  height: 13px;
 }
 
 /* other classes for App.js */

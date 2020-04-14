@@ -1,6 +1,6 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { Checkbox, FormControlLabel, Slider, Typography } from '@material-ui/core';
+import { Checkbox, FormControlLabel, Link, Slider, Typography } from '@material-ui/core';
 import Analytics from './Analytics';
 import "./SeriesChart.css";
 
@@ -165,7 +165,7 @@ class SeriesChart extends React.Component {
 		this.setState({type: (this.state.type === "logarithmic") ? "linear" : "logarithmic"});
 	}
 
-	handleCumulativeChange = (event) => {
+	handleCumulativeChanged = (event) => {
 		this.setState({cumulative: event.target.checked});
 	}
 
@@ -185,6 +185,10 @@ class SeriesChart extends React.Component {
 		this.setState({movingAverageDays: value, smooth: value !== 1});
 	}
 
+	handleSmoothChanged = (event) => {
+		this.setState({movingAverageDays: 5, smooth: event.target.checked});
+	}
+
 	render() {
 		const chartData = this.props.series && this.createChartData(
 			this.props.series, this.state.cumulative, this.state.smooth);
@@ -195,6 +199,7 @@ class SeriesChart extends React.Component {
 			},
 			responsive: true,
 			maintainAspectRatio: true,
+			aspectRatio: 1.5,
 			onClick: this.handleChartClick, // FYI there is also onResize, onComplete, onHover, before/afterUpdate
 			legend: {position: 'top'},
 			title: {display: true, text: this.props.title, fontSize: "16"},
@@ -215,13 +220,25 @@ class SeriesChart extends React.Component {
 				}]
 			}
 		};
-		
+
 		return (<div className="chartRoot">
 				<div className="chartControls">
 					<FormControlLabel className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
-					<FormControlLabel className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChange}/>
-					<Typography className="label" disabled={this.state.cumulative}>Smooth</Typography>
-					<Slider
+					<FormControlLabel className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
+
+					{this.props.small && <Link className="appTitle" target="_blank" href="https://nytimes.com"><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
+					{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
+
+					{this.props.small && <FormControlLabel
+						className="smooth"
+						control={<Checkbox size="small" color="default"/>} 
+						value={this.state.smooth}
+						label="Smooth"
+						disabled={this.state.cumulative}
+						onChange={this.handleSmoothChanged}/>}
+
+					{!this.props.small && <Typography className="label" disabled={this.state.cumulative}>Smooth</Typography>}
+					{!this.props.small && <Slider
 						className="slider"
 						disabled={this.state.cumulative}
 						min={1}
@@ -230,7 +247,7 @@ class SeriesChart extends React.Component {
 						track="inverted"
 						defaultValue={1}
 						onChange={this.handleSliderChanged}
-					/>
+					/>}
 				</div>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
 		</div>)

@@ -68,6 +68,10 @@ class Analytics {
 		this.countableEvent("arrow_click");
 	}
 
+	menuSelection() {
+		this.countableEvent("menu_selection");
+	}
+
 	static instance;
 }
 

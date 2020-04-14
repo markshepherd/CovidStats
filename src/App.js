@@ -1,12 +1,14 @@
 import React from 'react';
-import { FormControl, Link, MenuItem, Select, Slider, Tooltip } from '@material-ui/core';
+import { Slider, Tooltip } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { useEffect, useRef } from "react";
 
-
+import CovidData from './CovidData';
+import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
-import CovidData from './CovidData';
+import Utils from './Utils';
+
 import Analytics from './Analytics';
 import MyLink from './MyLink';
 
@@ -73,7 +75,7 @@ class App extends React.Component {
 		this.handleSliderChanged = this.handleSliderChanged.bind(this);	
 		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
 		this.trimToStartDate = this.trimToStartDate.bind(this);	
-		this.mql = window.matchMedia("(max-width: 1199px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
+		this.mql = window.matchMedia("(max-width: 999px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
 		this.mql.addListener(() => {
 			this.setState({small: this.mql.matches});
 		});
@@ -81,7 +83,6 @@ class App extends React.Component {
 		//var small = false;
 		this.state = {startDate: "2020-03-01", small: small,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
-		console.log("small", this.state.small);
 	}
 
 	calcStatesList(statesData) {
@@ -95,7 +96,31 @@ class App extends React.Component {
 		return result;
 	}
 
+	calcAllStatesCountiesList(statesData) {
+		var result = {};
+		for (const stateName in statesData) {
+			const stateData = statesData[stateName];
+			if (stateName === CovidData.allStates) continue;
+			const countyNames = Object.keys(stateData.countiesData);
+			for (var i = 0; i < countyNames.length; i += 1) {
+				var countyName = countyNames[i];
+				if (countyName !== CovidData.allCounties) {
+					const cases = stateData.countiesData[countyName].cases;
+					while (result[countyName]) {
+						countyName = countyName + " 2";
+					}
+					result[countyName] = {name: countyName, cases: cases};
+				}
+			}
+		}
+		return Utils.sortArray(Object.values(result), "name", false, true);
+	}
+
 	calcCountiesList(statesData, stateName) {
+		// if (stateName === CovidData.allStates) {
+		// 	return this.calcAllStatesCountiesList(statesData);
+		// }
+
 		const stateData = statesData[stateName];
 		const result = [];
 		const keys = Object.keys(stateData.countiesData).sort();
@@ -255,48 +280,21 @@ class App extends React.Component {
 
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
+						small={this.state.small}
+						appTitle="U.S. Covid-19 Stats"
+						updateDate={uiDate}
 						title={chartTitle}
-						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/></div>}
+						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/>
 
-				{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
-					<FormControl>
-				        <Select
-				        	className="stateMenu"
-				        	labelId="demo-simple-select-label"
-				        	id="demo-simple-select"
-				        	value={this.state.selectedState}
-				        	onChange={this.handleStateSelectChanged}
-				        >
-				        	{this.state.statesList.map((item) => {
-								return <MenuItem value={item.name}>{item.name}</MenuItem>
-						    })}
-				        </Select>
-				    </FormControl>
-				    <div className="stateUpDownButtons">
-						<Link href="#" onClick={this.handleStateUpClick} className="updown">▲</Link>
-						<Link href="#" onClick={this.handleStateDownClick} className="updown">▼</Link>
-					</div>
+					{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
+						<RegionMenu temp="state" list={this.state.statesList} onSelected={this.handleStateSelected}/>
+					</div>}
+
+					{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
+						<RegionMenu temp="county" list={this.countiesList} onSelected={this.handleCountySelected}/>
+					</div>}
 				</div>}
 
-				{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
-					<FormControl>
-				        <Select
-				        	className="countyMenu"
-				        	labelId="demo-simple-select-label2"
-				        	id="demo-simple-select2"
-				        	value={this.state.selectedCounty}
-				        	onChange={this.handleCountySelectChanged}
-				        >
-				        	{this.countiesList.map((item) => {
-								return <MenuItem value={item.name}>{item.name}</MenuItem>
-						    })}
-				        </Select>
-				    </FormControl>
-				    <div className="countyUpDownButtons">
-						<Link href="#" onClick={this.handleCountyUpClick} className="updown">▲</Link>
-						<Link href="#" onClick={this.handleCountyDownClick} className="updown">▼</Link>
-					</div>
-				</div>}
 
 				{!this.state.small && <div className="notes">
 					<div className="notesText">
