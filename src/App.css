@@ -6,7 +6,7 @@
   height: 100%;
   max-height: 100%;
   min-height: 100%;
-  min-width: 638px;
+  min-width: 666px;
 }
 
 /* iPhone 6, 7, 8 -----------
@@ -88,7 +88,7 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
   grid-area: chart;
   margin-bottom: 10px;
   flex: auto;
-  min-width: 638px;
+  min-width: 0px;
   position: relative;  
 }
 
@@ -96,12 +96,12 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
 
 .stateSelector {
   position: absolute;
-  right: 210px;
+  right: 185px;
   top: 5px;
 }
 .countySelector {
   position: absolute;
-  right: 40px;
+  right: 30px;
   top: 5px;
 }
 

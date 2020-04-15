@@ -14,7 +14,7 @@ import MyLink from './MyLink';
 
 import './App.css';
 
-const development = true;
+const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
@@ -281,7 +281,7 @@ class App extends React.Component {
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
 						small={this.state.small}
-						appTitle="U.S. Covid-19 Stats"
+						appTitle="Covid-19 by US State/County"
 						updateDate={uiDate}
 						title={chartTitle}
 						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/>
