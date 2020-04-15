@@ -19,8 +19,6 @@ const development = false;
 // for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
 // for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
 const pathPrefix = development ? "build/" : "";
-const dataDate = "4-12-20";
-const uiDate = "Apr 12, 2020"
 Analytics.enable(!development);
 
 const MyTooltip = withStyles((theme) => ({
@@ -135,13 +133,17 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		this.covidData = new CovidData(`${pathPrefix}us-counties-${dataDate}.csv`, (statesData) => {
+		const path = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv";
+		// const path = `${pathPrefix}us-counties-${dataDate}.csv`;
+		this.covidData = new CovidData(path, (statesData, latestDate) => {
 			var nationalTimeline =
 				statesData[CovidData.allStates].countiesData[CovidData.allCounties].timeline;
 			this.setState({
 				dateList: nationalTimeline.map((item) => item.date),
 				statesData: statesData,
-				statesList: this.calcStatesList(statesData)});
+				statesList: this.calcStatesList(statesData),
+				latestDate: latestDate
+			});
 		});
 	}
 
@@ -318,7 +320,7 @@ class App extends React.Component {
 				{!this.state.small && <div className="header">
 					<span className="myheader">Covid-19 Statistics by U.S. State and County</span>
 					<br/>
-					Last updated {uiDate}.
+					Updated {this.state.latestDate}
 				</div>}
 
 				{!this.state.small && this.state.statesList && <div className="state">
@@ -336,7 +338,7 @@ class App extends React.Component {
 						small={this.state.small}
 						appTitle="Covid-19 by US State/County"
 						onTitleClick={this.handleTitleClick}
-						updateDate={uiDate}
+						updateDate={this.state.latestDate}
 						title={chartTitle}
 						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/>
 

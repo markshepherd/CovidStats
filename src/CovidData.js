@@ -1,35 +1,35 @@
 export default class CovidData {
-
 	// This class reads a covid states/counties data file, and parses
-	// the file into a data structure like this:
+	// the file into the "statesData" data structure, which like this:
 	//
+	// statesData =
 	// {
 	// 	Alabama: {
 	// 		countiesData: {
-	//	 		" All counties": Series,
+	// 			" All counties": Series,
 	// 			Alameda: Series,
 	// 			Marin: Series,
-	// 			...
-	// 		},
+	// 			etc...
+	// 		}
 	// 	},
-	//  Alaska ...,
-	//  ...
-	//  " All states": { ... }
+	// 	Alaska ...,
+	// 	etc...
+	// 	" All states": { ... }
 	// }
 	//
 	// "Series" is like this 
 	// {
-	// 		timeline: [{date: ..., cases: ..., deaths: ..., totalCases: ..., totalDeaths: ...}, ...]
-	// 		cases: nnn
-	// 		deaths: nnn
+	// 	timeline: [{date: ..., cases: ..., deaths: ..., totalCases: ..., totalDeaths: ...}, ...]
+	// 	cases: nnn
+	// 	deaths: nnn
 	// }
-	//
-	// Once the data is available, we call the "callback" function 
-	// with the data structure as the parameter.
 
 	static allCounties = " All counties"; // the leading space makes it sort first.
 	static allStates = " All states";
 
+	// The constructor starts loading the data file from the server.
+	// Once the data is available, the "callback" function is called.
+	// Callback parameters are (statesData, latestDate)
 	constructor(filepath, callback) {
 		this.callback = callback;
 		this.readBigDataFile(filepath);
@@ -69,6 +69,7 @@ export default class CovidData {
 		var stateData;
 		var nationalSeries = {timeline: [], cases: 0, deaths: 0};
 		var statesData = {};
+		var latestDate = "2020-01-01";
 		var tokens;
 		var lines = csvText.split(/[\n\r]+/);
 		var linesArray = [];
@@ -110,6 +111,8 @@ export default class CovidData {
 			cases -= pc;
 			deaths -= pd;
 
+			if (date > latestDate) latestDate = date;
+
 			var newItem = {date: date, cases: cases, deaths: deaths, cumulativeCases: previousCases, cumulativeDeaths: previousDeaths};
 
 			this.addToSeries(nationalSeries, newItem);
@@ -139,7 +142,7 @@ export default class CovidData {
 		}
 		this.optimizeSeries(nationalSeries);
 		statesData[CovidData.allStates] = {countiesData: {[CovidData.allCounties]: nationalSeries}};
-		this.callback(statesData);
+		this.callback(statesData, latestDate);
 	}
 
 	/*private*/ readBigDataFile(filepath) {
