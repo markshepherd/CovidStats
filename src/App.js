@@ -3,6 +3,7 @@ import { Slider, Tooltip } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { useEffect, useRef } from "react";
 
+import AboutDialog from './AboutDialog';
 import CovidData from './CovidData';
 import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
@@ -62,7 +63,8 @@ class App extends React.Component {
 			statesData,
 			statesList,
 			selectedState,
-			selectedCounty
+			selectedCounty,
+			aboutOpen
 	 	}
 	*/
 
@@ -81,7 +83,7 @@ class App extends React.Component {
 		});
 		var small = this.mql.matches;
 		//var small = false;
-		this.state = {startDate: "2020-03-01", small: small,
+		this.state = {startDate: "2020-03-01", small: small, aboutOpen: false,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
 	}
 
@@ -250,7 +252,57 @@ class App extends React.Component {
 		Analytics.arrowClicked();
 	}
 
+	handleAboutCloseButton = (e) => {
+		this.setState({aboutOpen: false})
+	}
+
+	handleTitleClick = (e) => {
+		this.setState({aboutOpen: true})
+	}
+
 	render() {
+		var aboutInfo = <React.Fragment>
+			<div className="notesText">
+				<p>Created by 
+				<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
+				Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
+				Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
+				</p>
+			</div>
+
+			<div className="socialIcons">
+				<MyLink target="_blank" href="https://twitter.com/MarkEShepherd">
+				 	<img className="socialIcon"
+				 		align="right"
+				 		alt="Go to Mark's Twitter"
+				  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
+				</MyLink>
+				<br/>
+				<br/>
+                <MyLink target="_blank" href="https://larkdales.com">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"
+                    className="socialIcon" align="right" alt="Visit the Larkdales">
+                         <path d="M26.451.526C12.155.526.565 12.116.565 26.412s11.59 25.886 25.886 25.886 25.886-11.59 25.886-25.886S40.748.526 26.451.526zM40.005 27.14h-2.689v9.918c0 .718-.026 1.299-1.014 1.299h-6.574V28.41h-6.554v9.947h-6.263c-1.295 0-1.326-.581-1.326-1.299V27.14h-2.689c-.96 0-1.206-.56-.547-1.244l12.903-12.915a1.659 1.659 0 012.399 0l12.902 12.915c.659.684.413 1.244-.548 1.244z"></path></svg>
+                </MyLink>
+			</div>
+
+			<div className="dateControl">
+				<span>Choose starting date of graph...</span>
+				{this.state.dateList && <Slider
+					ref={this.sliderRef}
+					min={0}
+					max={this.state.dateList.length - 1}
+					track="inverted"
+					defaultValue={this.findDateIndex("2020-03-01")}
+					onChange={this.handleSliderChanged}
+					onChangeCommitted={this.handleSliderCommited}
+					valueLabelDisplay="auto"
+						valueLabelFormat={(index) => this.state.dateList[index]}	
+						ValueLabelComponent={FormatSliderValue}
+				/>}
+			</div>
+		</React.Fragment>;
+
 		const chartTitle = this.state.small
 			? ""
 			: (this.state.selectedCounty === CovidData.allCounties) 
@@ -278,10 +330,12 @@ class App extends React.Component {
 						list={this.countiesList}
 						onSelected={this.handleCountySelected}/></div>}
 
+
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
 						small={this.state.small}
 						appTitle="Covid-19 by US State/County"
+						onTitleClick={this.handleTitleClick}
 						updateDate={uiDate}
 						title={chartTitle}
 						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/>
@@ -296,47 +350,15 @@ class App extends React.Component {
 				</div>}
 
 
-				{!this.state.small && <div className="notes">
-					<div className="notesText">
-						<p>Created by 
-						<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
-						Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
-						Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
-						</p>
-					</div>
-
-					<div className="socialIcons">
-						<MyLink target="_blank" href="https://twitter.com/MarkEShepherd">
-						 	<img className="socialIcon"
-						 		align="right"
-						 		alt="Go to Mark's Twitter"
-						  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
-						</MyLink>
-						<br/>
-						<br/>
-                        <MyLink target="_blank" href="https://larkdales.com">
-	                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"
-	                        className="socialIcon" align="right" alt="Visit the Larkdales">
-                                 <path d="M26.451.526C12.155.526.565 12.116.565 26.412s11.59 25.886 25.886 25.886 25.886-11.59 25.886-25.886S40.748.526 26.451.526zM40.005 27.14h-2.689v9.918c0 .718-.026 1.299-1.014 1.299h-6.574V28.41h-6.554v9.947h-6.263c-1.295 0-1.326-.581-1.326-1.299V27.14h-2.689c-.96 0-1.206-.56-.547-1.244l12.903-12.915a1.659 1.659 0 012.399 0l12.902 12.915c.659.684.413 1.244-.548 1.244z"></path></svg>
-                        </MyLink>
-					</div>
-
-					<div className="dateControl">
-						<span>Choose starting date of graph...</span>
-						{this.state.dateList && <Slider
-							ref={this.sliderRef}
-							min={0}
-							max={this.state.dateList.length - 1}
-							track="inverted"
-							defaultValue={this.findDateIndex("2020-03-01")}
-							onChange={this.handleSliderChanged}
-							onChangeCommitted={this.handleSliderCommited}
-							valueLabelDisplay="auto"
-  							valueLabelFormat={(index) => this.state.dateList[index]}	
-  							ValueLabelComponent={FormatSliderValue}
-						/>}
-					</div>
+				{!this.state.small && <div className="notes notesContainer">
+					{aboutInfo}					
 				</div>}
+
+				<AboutDialog open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
+					<div className="notesContainer">
+					{aboutInfo}
+					</div>
+				</AboutDialog>
 			</div>);
 	}
 }

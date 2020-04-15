@@ -72,9 +72,12 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
   font-size: 12px;
   text-align: left;
   margin-left: 10px;
+}
+
+.notesContainer {
   display: grid;
   grid-template-columns: 1fr 25px;
-  grid-template-rows: 40px 80px;
+  grid-template-rows: 40px 80px;  
 }
 
 .header {

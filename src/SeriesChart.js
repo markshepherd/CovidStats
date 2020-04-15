@@ -226,7 +226,7 @@ class SeriesChart extends React.Component {
 					<FormControlLabel className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
 					<FormControlLabel className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
 
-					{this.props.small && <Link className="appTitle" target="_blank" href="https://nytimes.com"><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
+					{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
 					{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
 
 					{this.props.small && <FormControlLabel
