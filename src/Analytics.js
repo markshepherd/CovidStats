@@ -72,6 +72,10 @@ class Analytics {
 		this.countableEvent("menu_selection");
 	}
 
+	aboutDialogOpened() {
+		this.countableEvent("about_dialog");
+	}
+
 	static instance;
 }
 

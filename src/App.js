@@ -1,24 +1,22 @@
 import React from 'react';
-import { Slider, Tooltip } from '@material-ui/core';
+import { Slider, Tooltip, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { useEffect, useRef } from "react";
+import preval from 'preval.macro'
 
 import AboutDialog from './AboutDialog';
+import Analytics from './Analytics';
 import CovidData from './CovidData';
+import LoadingDialog from './LoadingDialog';
+import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import Utils from './Utils';
 
-import Analytics from './Analytics';
-import MyLink from './MyLink';
-
 import './App.css';
 
-const development = false;
-// for development=false, set package.json.homepage = "https://mark-shepherd.com/covid-stats" (formerly markshepherd.github.io)
-// for development=true, set package.json.homepage = "http://localhost/covid/CovidStats/build"
-const pathPrefix = development ? "build/" : "";
+const development = window.location.toString().match(/(localhost|covid-test)/)
 Analytics.enable(!development);
 
 const MyTooltip = withStyles((theme) => ({
@@ -81,7 +79,7 @@ class App extends React.Component {
 		});
 		var small = this.mql.matches;
 		//var small = false;
-		this.state = {startDate: "2020-03-01", small: small, aboutOpen: false,
+		this.state = {startDate: "2020-03-01", small: small, aboutOpen: false, isLoading: true,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
 	}
 
@@ -134,7 +132,6 @@ class App extends React.Component {
 
 	componentDidMount() {
 		const path = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv";
-		// const path = `${pathPrefix}us-counties-${dataDate}.csv`;
 		this.covidData = new CovidData(path, (statesData, latestDate) => {
 			var nationalTimeline =
 				statesData[CovidData.allStates].countiesData[CovidData.allCounties].timeline;
@@ -142,7 +139,8 @@ class App extends React.Component {
 				dateList: nationalTimeline.map((item) => item.date),
 				statesData: statesData,
 				statesList: this.calcStatesList(statesData),
-				latestDate: latestDate
+				latestDate: latestDate,
+				isLoading: false
 			});
 		});
 	}
@@ -269,6 +267,8 @@ class App extends React.Component {
 				<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
 				Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
 				Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
+				<br/>
+				<Typography variant="caption">{development ? "DEV " : ""}Website build {preval`module.exports = new Date().toLocaleString();`}</Typography>
 				</p>
 			</div>
 
@@ -277,7 +277,7 @@ class App extends React.Component {
 				 	<img className="socialIcon"
 				 		align="right"
 				 		alt="Go to Mark's Twitter"
-				  		src={`${pathPrefix}Twitter_Social_Icon_Circle_Color.svg`}/>
+				  		src="Twitter_Social_Icon_Circle_Color.svg"/>
 				</MyLink>
 				<br/>
 				<br/>
@@ -355,6 +355,8 @@ class App extends React.Component {
 				{!this.state.small && <div className="notes notesContainer">
 					{aboutInfo}					
 				</div>}
+
+				<LoadingDialog open={this.state.isLoading}/>
 
 				<AboutDialog open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
 					<div className="notesContainer">
