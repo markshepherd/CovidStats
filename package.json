@@ -9,10 +9,12 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "chart.js": "^2.9.3",
+    "preval.macro": "^5.0.0",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.9.0",
     "react-devtools": "^4.6.0",
     "react-dom": "^16.13.1",
+    "react-loader-spinner": "^3.1.14",
     "react-scripts": "3.4.1",
     "typeface-roboto": "0.0.75"
   },
@@ -37,5 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://mark-shepherd.com/covid-test"
+  "homepage": "."
 }
