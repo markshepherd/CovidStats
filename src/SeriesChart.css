@@ -13,7 +13,7 @@
   justify-items: end;  
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 19px 19px 19px;
+  grid-template-rows: 23px 23px 23px;
   grid-template-areas: 
     "log"
     "smooth"
@@ -58,14 +58,14 @@
 
 .appTitle {
   position: absolute;
-  top: 28px;
+  bottom: 8px;
   left: 10px;
   text-align: left;
 }
 
 .updateDate {
   position: absolute;
-  top: 10px;
+  bottom: 33px;
   left: 10px;
   text-align: left;
 }

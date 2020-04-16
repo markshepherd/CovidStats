@@ -208,7 +208,7 @@ class SeriesChart extends React.Component {
 					left: 0,
 					right: 0,
 					top: 0,
-					bottom: 50
+					bottom: 65
 				}
 			} : undefined,
 			scales: {
@@ -230,10 +230,12 @@ class SeriesChart extends React.Component {
 		};
 
 		const checkboxLabelPlacement = this.props.small ? "start" : undefined;
+		const checkboxSize = this.props.small ? "medium" : "small";
+
 		return (<div className="chartRoot">
 			<div className={this.props.small ? "smallChartControls" : "bigChartControls"}>
-				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
-				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size={checkboxSize} color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size={checkboxSize} color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
 
 				{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
 				{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
@@ -241,7 +243,7 @@ class SeriesChart extends React.Component {
 				{this.props.small && <FormControlLabel
 					labelPlacement={checkboxLabelPlacement}
 					className="smooth"
-					control={<Checkbox size="small" color="default"/>} 
+					control={<Checkbox size="medium" color="default"/>} 
 					value={this.state.smooth}
 					label="Smooth"
 					disabled={this.state.cumulative}
