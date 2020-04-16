@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControl, Link, MenuItem, Select } from '@material-ui/core';
+import { FormControl, MenuItem, Select } from '@material-ui/core';
 import './RegionMenu.css';
 import Analytics from './Analytics';
 

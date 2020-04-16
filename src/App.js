@@ -14,6 +14,7 @@ import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
 import Utils from './Utils';
+import { version } from './Version';
 
 import './App.css';
 
@@ -285,7 +286,7 @@ class App extends React.Component {
 				Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
 				Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
 				<br/>
-				<Typography variant="caption">{development ? "DEV " : ""}Website build {preval`module.exports = new Date().toLocaleString();`}</Typography>
+				<Typography variant="caption">{development ? "DEV " : ""}Version {version}, build {preval`module.exports = new Date().toLocaleString();`}</Typography>
 				</p>
 			</div>
 
