@@ -18,7 +18,7 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
 @media only screen and (min-width: 1000px) {
  .app {
   grid-template-columns: 160px 160px 1fr;
-  grid-template-rows: 55px minmax(200px, 1000px) 120px;
+  grid-template-rows: 30px minmax(200px, 1000px) 120px;
   grid-template-areas: 
     "header header header"
     "states counties chart"
@@ -99,13 +99,13 @@ and (orientation : landscape) and (-webkit-device-pixel-ratio: 2){
 
 .stateSelector {
   position: absolute;
-  right: 185px;
-  top: 5px;
+  right: 280px;
+  bottom: 3px;
 }
 .countySelector {
   position: absolute;
-  right: 30px;
-  top: 5px;
+  right: 128px;
+  bottom: 3px;
 }
 
 /* other classes for App.js */

@@ -5,7 +5,22 @@
   border-radius: 15px;
 }
 
-.chartControls {
+.smallChartControls {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  left: 10px;
+  justify-items: end;  
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 19px 19px 19px;
+  grid-template-areas: 
+    "log"
+    "smooth"
+    "cumulative";
+}
+
+.bigChartControls {
   position: absolute;
   top: 5px;
   left: 10px;
@@ -33,22 +48,24 @@
   grid-area: slider;
 }
 
+.smooth{
+  grid-area: smooth;
+}
+
 .cumulative {
   grid-area: cumulative;
 }
 
 .appTitle {
   position: absolute;
-  top: -4px;
-  left: 100px;
-  width: 250px;
-  text-align: center;
+  top: 28px;
+  left: 10px;
+  text-align: left;
 }
 
 .updateDate {
   position: absolute;
-  top: 18px;
-  left: 100px;
-  width: 250px;
-  text-align: center;
+  top: 10px;
+  left: 10px;
+  text-align: left;
 }

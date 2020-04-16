@@ -201,8 +201,16 @@ class SeriesChart extends React.Component {
 			maintainAspectRatio: true,
 			aspectRatio: 1.5,
 			onClick: this.handleChartClick, // FYI there is also onResize, onComplete, onHover, before/afterUpdate
-			legend: {position: 'top'},
-			title: {display: true, text: this.props.title, fontSize: "16"},
+			legend: {position: this.props.small ? "bottom" : "top"},
+			title: {display: this.props.title !== "", text: this.props.title, fontSize: "16"},
+			layout: this.props.small ? {
+				padding: {
+					left: 0,
+					right: 0,
+					top: 0,
+					bottom: 50
+				}
+			} : undefined,
 			scales: {
 				xAxes: [{
 					display: true
@@ -221,34 +229,37 @@ class SeriesChart extends React.Component {
 			}
 		};
 
+		const checkboxLabelPlacement = this.props.small ? "start" : undefined;
 		return (<div className="chartRoot">
-				<div className="chartControls">
-					<FormControlLabel className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
-					<FormControlLabel className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
+			<div className={this.props.small ? "smallChartControls" : "bigChartControls"}>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size="small" color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size="small" color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
 
-					{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
-					{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
+				{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
+				{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
 
-					{this.props.small && <FormControlLabel
-						className="smooth"
-						control={<Checkbox size="small" color="default"/>} 
-						value={this.state.smooth}
-						label="Smooth"
-						disabled={this.state.cumulative}
-						onChange={this.handleSmoothChanged}/>}
+				{this.props.small && <FormControlLabel
+					labelPlacement={checkboxLabelPlacement}
+					className="smooth"
+					control={<Checkbox size="small" color="default"/>} 
+					value={this.state.smooth}
+					label="Smooth"
+					disabled={this.state.cumulative}
+					onChange={this.handleSmoothChanged}/>}
 
-					{!this.props.small && <Typography className="label" disabled={this.state.cumulative}>Smooth</Typography>}
-					{!this.props.small && <Slider
-						className="slider"
-						disabled={this.state.cumulative}
-						min={1}
-						max={5}
-						step={2}
-						track="inverted"
-						defaultValue={1}
-						onChange={this.handleSliderChanged}
-					/>}
-				</div>
+				{!this.props.small && <Typography className="label" disabled={this.state.cumulative}>Smooth</Typography>}
+				{!this.props.small && <Slider
+					className="slider"
+					disabled={this.state.cumulative}
+					min={1}
+					max={5}
+					step={2}
+					track="inverted"
+					defaultValue={1}
+					onChange={this.handleSliderChanged}
+				/>}
+				{this.props.children}
+			</div>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
 		</div>)
 	}

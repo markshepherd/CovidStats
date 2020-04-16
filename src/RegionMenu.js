@@ -9,7 +9,6 @@ export default class RegionMenu extends React.Component {
 		this.state = {selection: this.props.list.length > 0 ? this.props.list[0].name : ""};
 	}
 
-
 	listsEqual(a, b) {
 		return (a.length === b.length) && (a.length === 0 || (a[0].name === b[0].name));
 	}
@@ -75,10 +74,6 @@ export default class RegionMenu extends React.Component {
 				    })}
 		        </Select>
 		    </FormControl>
-		    <div className="upDownButtons">
-				<Link href="#" onClick={this.handleUpClick} className="upDownButton">▲</Link>
-				<Link href="#" onClick={this.handleDownClick} className="upDownButton">▼</Link>
-			</div>
 		</div>);
 	}
 }

@@ -7,6 +7,7 @@ import preval from 'preval.macro'
 import AboutDialog from './AboutDialog';
 import Analytics from './Analytics';
 import CovidData from './CovidData';
+import GestureHandler from './GestureHandler';
 import LoadingDialog from './LoadingDialog';
 import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
@@ -74,11 +75,7 @@ class App extends React.Component {
 		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
 		this.trimToStartDate = this.trimToStartDate.bind(this);	
 		this.mql = window.matchMedia("(max-width: 999px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
-		this.mql.addListener(() => {
-			this.setState({small: this.mql.matches});
-		});
 		var small = this.mql.matches;
-		//var small = false;
 		this.state = {startDate: "2020-03-01", small: small, aboutOpen: false, isLoading: true,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
 	}
@@ -143,7 +140,14 @@ class App extends React.Component {
 				isLoading: false
 			});
 		});
+		this.mql.addListener(() => {
+			this.setState({small: this.mql.matches});
+		});
 	}
+
+	sliderRef = React.createRef();
+	stateMenuRef = React.createRef();
+	countyMenuRef = React.createRef();
 
 	handleStateSelected(stateName) {
 		this.setState({selectedState: stateName});
@@ -152,8 +156,6 @@ class App extends React.Component {
 	handleCountySelected(countyName) {
 		this.setState({selectedCounty: countyName});
 	}
-
-	sliderRef = React.createRef();
 
 	handleSliderChanged(e, value) {
 		this.setState({startDate: this.state.dateList[value]});
@@ -260,6 +262,22 @@ class App extends React.Component {
 		this.setState({aboutOpen: true})
 	}
 
+	handleSwipeLeft = (e) => {
+		this.countyMenuRef.current.handleDownClick();
+	}
+
+	handleSwipeRight = (e) => {
+		this.countyMenuRef.current.handleUpClick();
+	}
+
+	handleSwipeDown = (e) => {
+		this.stateMenuRef.current.handleUpClick();
+	}
+
+	handleSwipeUp = (e) => {
+		this.stateMenuRef.current.handleDownClick();
+	}
+
 	render() {
 		var aboutInfo = <React.Fragment>
 			<div className="notesText">
@@ -315,6 +333,7 @@ class App extends React.Component {
 			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
 		}
 
+
 		return (
 			<div className="app"> 
 				{!this.state.small && <div className="header">
@@ -332,7 +351,6 @@ class App extends React.Component {
 						list={this.countiesList}
 						onSelected={this.handleCountySelected}/></div>}
 
-
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
 						small={this.state.small}
@@ -340,15 +358,16 @@ class App extends React.Component {
 						onTitleClick={this.handleTitleClick}
 						updateDate={this.state.latestDate}
 						title={chartTitle}
-						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}/>
+						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}>
 
-					{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
-						<RegionMenu temp="state" list={this.state.statesList} onSelected={this.handleStateSelected}/>
-					</div>}
+						{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
+							<RegionMenu ref={this.stateMenuRef} list={this.state.statesList} onSelected={this.handleStateSelected}/>
+						</div>}
 
-					{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
-						<RegionMenu temp="county" list={this.countiesList} onSelected={this.handleCountySelected}/>
-					</div>}
+						{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
+							<RegionMenu ref={this.countyMenuRef} list={this.countiesList} onSelected={this.handleCountySelected}/>
+						</div>}
+					</SeriesChart>
 				</div>}
 
 
@@ -363,6 +382,11 @@ class App extends React.Component {
 					{aboutInfo}
 					</div>
 				</AboutDialog>
+
+				<GestureHandler enabled={this.state.small}
+					onSwipeLeft={this.handleSwipeLeft} onSwipeRight={this.handleSwipeRight}
+					onSwipeDown={this.handleSwipeDown} onSwipeUp={this.handleSwipeUp}
+				/>
 			</div>);
 	}
 }
