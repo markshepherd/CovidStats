@@ -375,13 +375,13 @@ class App extends React.Component {
 					{aboutInfo}					
 				</div>}
 
-				<LoadingDialog open={this.state.isLoading}/>
+				{this.state.isLoading && <LoadingDialog open={this.state.isLoading}/>}
 
-				<AboutDialog open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
+				{this.state.aboutOpen && <AboutDialog open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
 					<div className="notesContainer">
 					{aboutInfo}
 					</div>
-				</AboutDialog>
+				</AboutDialog>}
 
 				<GestureHandler enabled={this.state.small}
 					onSwipeLeft={this.handleSwipeLeft} onSwipeRight={this.handleSwipeRight}
