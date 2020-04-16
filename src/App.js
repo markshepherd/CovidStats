@@ -7,7 +7,7 @@ import preval from 'preval.macro'
 import AboutDialog from './AboutDialog';
 import Analytics from './Analytics';
 import CovidData from './CovidData';
-import GestureHandler from './GestureHandler';
+// import GestureHandler from './GestureHandler';
 import LoadingDialog from './LoadingDialog';
 import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
@@ -75,8 +75,7 @@ class App extends React.Component {
 		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
 		this.trimToStartDate = this.trimToStartDate.bind(this);	
 		this.mql = window.matchMedia("(max-width: 999px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
-		var small = this.mql.matches;
-		this.state = {startDate: "2020-03-01", small: small, aboutOpen: false, isLoading: true,
+		this.state = {startDate: "2020-03-01", small: this.mql.matches, aboutOpen: false, isLoading: true,
 			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
 	}
 
@@ -262,21 +261,21 @@ class App extends React.Component {
 		this.setState({aboutOpen: true})
 	}
 
-	handleSwipeLeft = (e) => {
-		this.countyMenuRef.current.handleDownClick();
-	}
+	// handleSwipeLeft = (e) => {
+	// 	this.countyMenuRef.current.handleDownClick();
+	// }
 
-	handleSwipeRight = (e) => {
-		this.countyMenuRef.current.handleUpClick();
-	}
+	// handleSwipeRight = (e) => {
+	// 	this.countyMenuRef.current.handleUpClick();
+	// }
 
-	handleSwipeDown = (e) => {
-		this.stateMenuRef.current.handleUpClick();
-	}
+	// handleSwipeDown = (e) => {
+	// 	this.stateMenuRef.current.handleUpClick();
+	// }
 
-	handleSwipeUp = (e) => {
-		this.stateMenuRef.current.handleDownClick();
-	}
+	// handleSwipeUp = (e) => {
+	// 	this.stateMenuRef.current.handleDownClick();
+	// }
 
 	render() {
 		var aboutInfo = <React.Fragment>
@@ -333,7 +332,6 @@ class App extends React.Component {
 			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
 		}
 
-
 		return (
 			<div className="app"> 
 				{!this.state.small && <div className="header">
@@ -350,6 +348,7 @@ class App extends React.Component {
 					<RegionTable extra="color2" title="County"
 						list={this.countiesList}
 						onSelected={this.handleCountySelected}/></div>}
+
 
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
@@ -370,7 +369,6 @@ class App extends React.Component {
 					</SeriesChart>
 				</div>}
 
-
 				{!this.state.small && <div className="notes notesContainer">
 					{aboutInfo}					
 				</div>}
@@ -383,10 +381,10 @@ class App extends React.Component {
 					</div>
 				</AboutDialog>}
 
-				<GestureHandler enabled={this.state.small}
+				{/*<GestureHandler enabled={this.state.small}
 					onSwipeLeft={this.handleSwipeLeft} onSwipeRight={this.handleSwipeRight}
 					onSwipeDown={this.handleSwipeDown} onSwipeUp={this.handleSwipeUp}
-				/>
+				/>*/}
 			</div>);
 	}
 }

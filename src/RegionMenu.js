@@ -74,6 +74,10 @@ export default class RegionMenu extends React.Component {
 				    })}
 		        </Select>
 		    </FormControl>
+		    {/*<div className="upDownButtons">
+				<Link href="#" onClick={this.handleUpClick} className="upDownButton">▲</Link>
+				<Link href="#" onClick={this.handleDownClick} className="upDownButton">▼</Link>
+			</div>*/}
 		</div>);
 	}
 }
