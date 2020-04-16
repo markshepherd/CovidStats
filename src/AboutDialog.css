@@ -1,11 +1,19 @@
-.closeButton {
-  position: absolute;
-  right: 40px;
-  top: 0px;
-}
-
 .dialogTitle {
   padding: 20px;
   position: relative;
   width: 100%;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-right: 20px;
+}
+
+.title {
+}
+
+.closeButton {
+  margin-top: -10px;
 }

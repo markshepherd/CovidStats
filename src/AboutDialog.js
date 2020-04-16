@@ -9,6 +9,7 @@ export default class AboutDialog extends React.Component {
 		this.props.onCloseButton();
 	}
 
+
 	noop = (something) => {
 		Analytics.aboutDialogOpened();
 		return something;
@@ -23,11 +24,13 @@ export default class AboutDialog extends React.Component {
     				}
   				}}>
 				<DialogTitle class="dialogTitle" disableTypography id="customized-dialog-title" onClose={this.handleCloseButton}>
-					<Typography variant="h6">Covid-19 Statistics for U.S. States & Counties</Typography>
-					<div className="closeButton">
-						<IconButton onClick={this.handleCloseButton}>
-				          <CloseIcon />
-				        </IconButton>
+					<div className="titleContainer">
+						<Typography className="title" variant="h6">Covid-19 Statistics for U.S. States & Counties</Typography>
+						<div className="closeButton">
+							<IconButton onClick={this.handleCloseButton}>
+					          <CloseIcon />
+					        </IconButton>
+					    </div>
 			        </div>
 				</DialogTitle>
 				<DialogContent dividers>
