@@ -1,5 +1,5 @@
-import React from 'react';
-import { Slider, Tooltip, Typography } from '@material-ui/core';
+ import React from 'react';
+import { FormControlLabel, Slider, Tooltip, Typography } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 import { useEffect, useRef } from "react";
 import preval from 'preval.macro'
@@ -13,7 +13,7 @@ import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
-import Utils from './Utils';
+// import Utils from './Utils';
 import { version } from './Version';
 
 import './App.css';
@@ -55,32 +55,29 @@ const FormatSliderValue = props => {
 
 
 class App extends React.Component {
-	/* this.state = 
-		{
-			dateList,
-			statesData,
-			statesList,
-			selectedState,
-			selectedCounty,
-			aboutOpen
-	 	}
-	*/
-
 	constructor(props) {	
 		super(props);
-		this.calcStatesList = this.calcStatesList.bind(this);		
-		this.calcCountiesList = this.calcCountiesList.bind(this);		
-		this.handleStateSelected = this.handleStateSelected.bind(this);		
-		this.handleCountySelected = this.handleCountySelected.bind(this);	
-		this.handleSliderChanged = this.handleSliderChanged.bind(this);	
-		this.handleSliderCommited = this.handleSliderCommited.bind(this);	
-		this.trimToStartDate = this.trimToStartDate.bind(this);	
+
 		this.mql = window.matchMedia("(max-width: 999px)"); // https://medium.com/better-programming/how-to-use-media-queries-programmatically-in-react-4d6562c3bc97
-		this.state = {startDate: "2020-03-01", small: this.mql.matches, aboutOpen: false, isLoading: true,
-			selectedState: CovidData.allStates, selectedCounty: CovidData.allCounties};
+		this.sliderRef = React.createRef();
+		this.stateMenuRef = React.createRef();
+		this.countyMenuRef = React.createRef();
+
+		this.state = {
+			aboutOpen: false,
+			dateList: undefined,
+			isLoading: true,
+			latestDate: undefined,
+			selectedCounty: CovidData.allCounties,
+			selectedState: CovidData.allStates,
+			small: this.mql.matches,
+			startDate: "2020-03-01",
+			statesData: undefined,
+			statesList: undefined
+		};
 	}
 
-	calcStatesList(statesData) {
+	calcStatesList = (statesData) => {
 		const result = [];
 		const keys = Object.keys(statesData).sort();
 		for (var i = 0; i < keys.length; i += 1) {
@@ -91,6 +88,7 @@ class App extends React.Component {
 		return result;
 	}
 
+	/*
 	calcAllStatesCountiesList(statesData) {
 		var result = {};
 		for (const stateName in statesData) {
@@ -110,8 +108,9 @@ class App extends React.Component {
 		}
 		return Utils.sortArray(Object.values(result), "name", false, true);
 	}
+	*/
 
-	calcCountiesList(statesData, stateName) {
+	calcCountiesList = (statesData, stateName) => {
 		// if (stateName === CovidData.allStates) {
 		// 	return this.calcAllStatesCountiesList(statesData);
 		// }
@@ -145,23 +144,19 @@ class App extends React.Component {
 		});
 	}
 
-	sliderRef = React.createRef();
-	stateMenuRef = React.createRef();
-	countyMenuRef = React.createRef();
-
-	handleStateSelected(stateName) {
+	handleStateSelected = (stateName) => {
 		this.setState({selectedState: stateName});
 	}
 
-	handleCountySelected(countyName) {
+	handleCountySelected = (countyName) => {
 		this.setState({selectedCounty: countyName});
 	}
 
-	handleSliderChanged(e, value) {
+	handleSliderChanged = (e, value) => {
 		this.setState({startDate: this.state.dateList[value]});
 	}
 
-	handleSliderCommited(e, value) {
+	handleSliderCommited = (e, value) => {
 		Analytics.dateSliderUsed();
 	}
 
@@ -181,7 +176,7 @@ class App extends React.Component {
 		return result;
 	}
 
-	trimToStartDate(startDate, series) {
+	trimToStartDate = (startDate, series) => {
 		if (!series || !series.timeline || series.timeline.length === 0) {
 			return series;
 		}
@@ -279,47 +274,55 @@ class App extends React.Component {
 	// }
 
 	render() {
-		var aboutInfo = <React.Fragment>
+		const buildDate = preval`module.exports = new Date().toLocaleString();`;
+
+		const aboutInfo = <React.Fragment>
+			{this.state.dateList && 
+				<div className="dateControl">
+					<FormControlLabel
+						className="dateFormControl"
+						label="Start&nbsp;date&nbsp;&nbsp;"
+						labelPlacement="start"
+						control={<Slider
+							ref={this.sliderRef}
+							min={0}
+							max={this.state.dateList.length - 1}
+							track="inverted"
+							defaultValue={this.findDateIndex("2020-03-01")}
+							onChange={this.handleSliderChanged}
+							onChangeCommitted={this.handleSliderCommited}
+							valueLabelDisplay="auto"
+							valueLabelFormat={(index) => this.state.dateList[index]}	
+							ValueLabelComponent={FormatSliderValue}
+						/>}
+					/>
+				</div>
+			}
+
 			<div className="notesText">
 				<p>Created by 
 				<MyLink target="_blank" href="mailto:markcharts591@gmail.com"> Mark Shepherd</MyLink>.
 				Data provided by the <MyLink target="_blank" href="https://github.com/nytimes/covid-19-data"> New York Times</MyLink>.
 				Source code is <MyLink target="_blank" href="https://github.com/markshepherd/CovidStats"> here</MyLink>.
-				<br/>
-				<Typography variant="caption">{development ? "DEV " : ""}Version {version}, build {preval`module.exports = new Date().toLocaleString();`}</Typography>
 				</p>
 			</div>
 
-			<div className="socialIcons">
+			<div className="lastRow">
 				<MyLink target="_blank" href="https://twitter.com/MarkEShepherd">
-				 	<img className="socialIcon"
+				 	<img className="socialIconT"
 				 		align="right"
 				 		alt="Go to Mark's Twitter"
 				  		src="Twitter_Social_Icon_Circle_Color.svg"/>
 				</MyLink>
 				<br/>
-				<br/>
                 <MyLink target="_blank" href="https://larkdales.com">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"
-                    className="socialIcon" align="right" alt="Visit the Larkdales">
+                    className="socialIconH" align="right" alt="Visit the Larkdales">
                          <path d="M26.451.526C12.155.526.565 12.116.565 26.412s11.59 25.886 25.886 25.886 25.886-11.59 25.886-25.886S40.748.526 26.451.526zM40.005 27.14h-2.689v9.918c0 .718-.026 1.299-1.014 1.299h-6.574V28.41h-6.554v9.947h-6.263c-1.295 0-1.326-.581-1.326-1.299V27.14h-2.689c-.96 0-1.206-.56-.547-1.244l12.903-12.915a1.659 1.659 0 012.399 0l12.902 12.915c.659.684.413 1.244-.548 1.244z"></path></svg>
                 </MyLink>
-			</div>
-
-			<div className="dateControl">
-				<span>Choose starting date of graph...</span>
-				{this.state.dateList && <Slider
-					ref={this.sliderRef}
-					min={0}
-					max={this.state.dateList.length - 1}
-					track="inverted"
-					defaultValue={this.findDateIndex("2020-03-01")}
-					onChange={this.handleSliderChanged}
-					onChangeCommitted={this.handleSliderCommited}
-					valueLabelDisplay="auto"
-						valueLabelFormat={(index) => this.state.dateList[index]}	
-						ValueLabelComponent={FormatSliderValue}
-				/>}
+                <Typography variant="caption">
+					{development ? "DEV " : ""}Version {version}, {buildDate}
+				</Typography>
 			</div>
 		</React.Fragment>;
 

@@ -1,0 +1,11 @@
+.closeButton {
+  position: absolute;
+  right: 40px;
+  top: 0px;
+}
+
+.dialogTitle {
+  padding: 20px;
+  position: relative;
+  width: 100%;
+}

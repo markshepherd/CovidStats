@@ -1,10 +1,8 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Typography } from '@material-ui/core/';
+import CloseIcon from '@material-ui/icons/Close';
 import Analytics from './Analytics';
+import "./AboutDialog.css";
 
 export default class AboutDialog extends React.Component {
 	handleCloseButton = () =>{
@@ -18,16 +16,26 @@ export default class AboutDialog extends React.Component {
 
 	render() {
 		return (
-			<Dialog onClose={this.handleCloseButton} open={this.noop(this.props.open)} aria-labelledby="customized-dialog-title">
-				<DialogTitle id="customized-dialog-title" onClose={this.handleCloseButton}>
-					Covid-19 Statistics for U.S. States & Counties 
+			<Dialog onClose={this.handleCloseButton} open={this.noop(this.props.open)} aria-labelledby="customized-dialog-title"
+				PaperProps={{
+    				style: {
+      					backgroundColor: '#ffffffee'
+    				}
+  				}}>
+				<DialogTitle class="dialogTitle" disableTypography id="customized-dialog-title" onClose={this.handleCloseButton}>
+					<Typography variant="h6">Covid-19 Statistics for U.S. States & Counties</Typography>
+					<div className="closeButton">
+						<IconButton onClick={this.handleCloseButton}>
+				          <CloseIcon />
+				        </IconButton>
+			        </div>
 				</DialogTitle>
 				<DialogContent dividers>
 					{this.props.children}
 				</DialogContent>
 				<DialogActions>
 					<Button autoFocus onClick={this.handleCloseButton} color="primary">
-					Dismiss
+					OK
 					</Button>
 				</DialogActions>
 			</Dialog>

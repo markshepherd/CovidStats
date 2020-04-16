@@ -3,6 +3,7 @@
   position: relative;
   background-color: #fafafa;
   border-radius: 15px;
+  padding-top: 10px;
 }
 
 .smallChartControls {
@@ -58,14 +59,14 @@
 
 .appTitle {
   position: absolute;
-  bottom: 8px;
+  bottom: 5px;
   left: 10px;
   text-align: left;
 }
 
 .updateDate {
   position: absolute;
-  bottom: 33px;
+  bottom: 30px;
   left: 10px;
   text-align: left;
 }
