@@ -13,6 +13,8 @@ import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
+import Utils from './Utils';
+
 import { version } from './Version';
 import './App.css';
 
@@ -167,35 +169,6 @@ class App extends React.Component {
 		this.handleCountySelected(e.currentTarget.textContent);
 	}
 
-	findDateIndex(date) {
-		var result = this.state.dateList.findIndex((element) => { 
-			var x = element === date;
-			return x;
-		});
-		return result;
-	}
-
-	trimToStartDate = (startDate, series) => {
-		if (!series || !series.timeline || series.timeline.length === 0) {
-			return series;
-		}
-		for(var i = 0; i < series.timeline.length; i += 1) {
-			if (startDate <= series.timeline[i].date) {
-				var result = Object.assign({}, series);
-				result.timeline = series.timeline.slice(i);
-				var desiredIndex = this.findDateIndex(startDate);
-				var currentIndex = this.findDateIndex(result.timeline[0].date);
-				while(desiredIndex < currentIndex) {
-					currentIndex -= 1;
-					result.timeline.unshift(
-						{date: this.state.dateList[currentIndex], cases: 0, deaths: 0});
-				}
-				return result;
-			}
-		}
-		return series;
-	}
-
 	findSelectedCountyIndex() {
 		for (var i = 0; i < this.countiesList.length; i += 1) {
 			if (this.countiesList[i].name === this.state.selectedCounty) {
@@ -287,7 +260,7 @@ class App extends React.Component {
 							min={0}
 							max={this.state.dateList.length - 1}
 							track="inverted"
-							defaultValue={this.findDateIndex("2020-03-01")}
+							defaultValue={Utils.findDateIndex("2020-03-01", this.state.dateList)}
 							onChange={this.handleSliderChanged}
 							onChangeCommitted={this.handleSliderCommited}
 							valueLabelDisplay="auto"
@@ -343,6 +316,11 @@ class App extends React.Component {
 				? this.state.selectedState + "," + this.state.selectedCounty
 				: this.state.selectedState + ", " + this.state.selectedCounty + " county";
 
+		const chartLabel = this.state.selectedCounty
+			+ (this.state.selectedCounty === CovidData.allCounties ? "" : " county")
+			+ ", " + (this.state.selectedState === CovidData.allStates
+				? CovidData.allStates : Utils.stateAbbreviation(this.state.selectedState));
+
 		if (this.state.statesData && this.state.selectedState) {
 			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
 		}
@@ -372,7 +350,10 @@ class App extends React.Component {
 						onTitleClick={this.handleTitleClick}
 						updateDate={this.state.latestDate}
 						title={chartTitle}
-						series={this.trimToStartDate(this.state.startDate, this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty])}>
+						startDate={this.state.startDate}
+						dateList={this.state.dateList}
+						label={chartLabel}
+						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}>
 
 						{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
 							<RegionMenu ref={this.stateMenuRef} list={this.state.statesList} onSelected={this.handleStateSelected}/>

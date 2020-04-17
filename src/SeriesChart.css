@@ -34,6 +34,30 @@
     "log log"
 }
 
+.bigLockButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+.smallLockButton {
+  position: absolute;
+  bottom: 40px;
+  right: 110px;
+}
+
+.bigLockControls {
+  position: absolute;
+  top: 20px;
+  right: 0px;
+}
+
+.smallLockControls {
+  position: absolute;
+  bottom: 20px;
+  right: 110px;
+}
+
 .log {
   grid-area: log;
 }

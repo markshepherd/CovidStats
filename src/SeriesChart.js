@@ -1,14 +1,33 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { Checkbox, FormControlLabel, Link, Slider, Typography } from '@material-ui/core';
+import { Button, Checkbox, FormControlLabel, Link, Slider, Typography } from '@material-ui/core';
 import Analytics from './Analytics';
+import Utils from './Utils';
 import "./SeriesChart.css";
+
+// from https://material.io/resources/color/#!/?view.left=0&view.right=0
+// all the "500" colors in primary and light.
+const material500Colors = [
+	["#009688", "#52c7b8"],
+	["#8bc34a", "#bef67a"],
+	["#673ab7", "#9a67ea"],
+	["#2196f3", "#6ec6ff"],
+	["#00bcd4", "#62efff"],
+	["#4caf50", "#80e27e"],
+	["#f44336", "#ff7961"],
+	["#e91e63", "#ff6090"],
+	["#9c27b0", "#d05ce3"],
+	["#3f51b5", "#757de8"],
+	["#03a9f4", "#67daff"],
+];
+
+const lockMax = 11;
 
 class SeriesChart extends React.Component {
 	constructor (props) {
 		super(props);
 		this.chartRef = React.createRef();
-		this.state = {type: "linear", movingAverageDays: 1, cumulative: false, smooth: false};
+		this.state = {type: "linear", movingAverageDays: 1, cumulative: false, smooth: false, lockedSeries: [], showCases: true};
 		this.datasets = [];
 	}
 
@@ -25,7 +44,8 @@ class SeriesChart extends React.Component {
 				var ind = Math.min(array.length - 1, i + half - j);
 				sum += array[ind];
 			}
-			result.push(sum / number);
+			var num = sum / number;
+			result.push((num < 1) ? num : Math.floor(num));
 		}
 		return result;
 	}
@@ -39,30 +59,24 @@ class SeriesChart extends React.Component {
 		5: false
 	};
 
-	findMin(array) {
-		let min = Number.POSITIVE_INFINITY;
-		for (let i = 0; i < array.length; i += 1) {
-			min = Math.min(min, array[i]);
+	currentSeriesLocked() {
+		for (var i = 0; i < this.state.lockedSeries.length; i += 1) {
+			if (this.state.lockedSeries[i].label === this.props.label) return true;
 		}
-		return min;
+		return false;
 	}
 
-	findMax(array) {
-		let max = Number.NEGATIVE_INFINITY;
-		for (let i = 0; i < array.length; i += 1) {
-			max = Math.max(max, array[i]);
-		}
-		return max;
-	}
-
-	createChartData (series, cumulative, smooth) {
+	createChartDataOneTrack (series, label, colors, highlight) {
+		var datasets = [];
 		var labels = [];
 		var casesData = [];
 		var deathsData = [];
 		var cumulativeCasesData = [];
 		var cumulativeDeathsData = [];
-		for (var i = 0; i < series.timeline.length; i += 1) {
-			var item = series.timeline[i];
+		var trimmedSeries = Utils.trimToStartDate(this.props.startDate, series, this.props.dateList);
+
+		for (var i = 0; i < trimmedSeries.timeline.length; i += 1) {
+			var item = trimmedSeries.timeline[i];
 			labels.push(item.date.replace(/2020-/, ""));
 			casesData.push(item.cases);
 			deathsData.push(item.deaths);
@@ -71,93 +85,115 @@ class SeriesChart extends React.Component {
 		}
 
 		const datasetLabels = [
-			"Cumulative Cases", "Cumulative Deaths", "Daily New Cases", 
-			`Daily New Cases ${this.state.movingAverageDays}-day Average`, "Daily Deaths",
+			"Cumulative Cases", "Cumulative Deaths", "Daily Cases", 
+			`Daily Cases ${this.state.movingAverageDays}-day Average`, "Daily Deaths",
 			`Daily Deaths ${this.state.movingAverageDays}-day Average`];
 
 		this.minY = undefined;
 		this.maxY = undefined;
 
-		if (cumulative) {
-			this.datasets = [
+		const showCases = (this.state.lockedSeries.length === 0) || this.state.showCases;
+		const showDeaths = (this.state.lockedSeries.length === 0) || !this.state.showCases;
+		const backgroundColor = highlight ? "#000000" : "#aaaaaa";
+		const makeLabel = (n) => datasetLabels[n] + ": " + (label ? (label + " ") : "");
+
+		if (this.state.cumulative) {
+			showCases && datasets.push(
 				{
 					myId: 0,
-					label: datasetLabels[0],
-					backgroundColor: "#333333",
-					borderColor: 'rgba(75,75,192,0.5)',
+					label: makeLabel(0),
+					backgroundColor: backgroundColor,
+					borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.5)',
 					borderWidth: 2,
 					fill: false,
 					hidden: this.isHidden[0],
 					data: cumulativeCasesData
-				},
+				});
+
+				showDeaths && datasets.push(
 				{
 					myId: 1,
-					label: datasetLabels[1],
-					backgroundColor: "#333333",
-					borderColor: 'rgba(75,150,75,0.5)',
+					label: makeLabel(1),
+					backgroundColor: backgroundColor,
+					borderColor: colors[1] + "60", // 'rgba(75,150,75,0.5)',
 					borderWidth: 2,
 					fill: false,
 					hidden: this.isHidden[1],
 					data: cumulativeDeathsData
-				}
-			];
+				});
 
-		} else if (smooth) {
-			this.datasets = [
+		} else if (this.state.smooth) {
+			showCases && datasets.push(
 				{
-					myId: 3,
-					label: datasetLabels[3],
-					backgroundColor: "#aaaaaa",
-					borderColor: 'rgba(75,75,192,0.3)',
+					myId: 0,
+					label: makeLabel(3),
+					backgroundColor: backgroundColor,
+					borderColor: colors[0] + "50", // 'rgba(75,75,192,0.3)',
 					borderWidth: 4,
 					fill: false,
-					hidden: this.isHidden[3],
+					hidden: this.isHidden[0],
 					data: this.calcMovingAverage(casesData, this.state.movingAverageDays),
 					origData: casesData
-				},			
+				});
+
+			showDeaths && datasets.push(
 				{
-					myId: 5,
-					label: datasetLabels[5],
-					borderColor: 'rgba(75,150,75,0.3)',
+					myId: 1,
+					label: makeLabel(4),
+					backgroundColor: backgroundColor,
+					borderColor: colors[1] + "50", // 'rgba(75,150,75,0.3)',
 					borderWidth: 4,
 					fill: false,
-					hidden: this.isHidden[5],
+					hidden: this.isHidden[1],
 					data: this.calcMovingAverage(deathsData, this.state.movingAverageDays),
 					origData: deathsData
-				}
-			];
+				});
 
 			if (!this.isHidden[3] && !this.isHidden[5]) {
-				this.minY = Math.min(this.findMin(casesData), this.findMin(deathsData));
-				this.maxY = Math.max(this.findMax(casesData), this.findMax(deathsData));
+				this.minY = Math.min(Utils.findMin(casesData), Utils.findMin(deathsData));
+				this.maxY = Math.max(Utils.findMax(casesData), Utils.findMax(deathsData));
 			}
 
 		} else {
-			this.datasets = [
+			showCases && datasets.push(
 				{
-					myId: 2,
-					label: datasetLabels[2],
-					backgroundColor: "#aaaaaa",
-					borderColor: 'rgba(75,75,192,0.7)',
+					myId: 0,
+					label: makeLabel(2),
+					backgroundColor: backgroundColor,
+					borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.7)',
 					borderWidth: 2,
 					fill: false,
-					hidden: this.isHidden[2],
+					hidden: this.isHidden[0],
 					data: casesData
-				},
+				});
+
+			showDeaths && datasets.push(
 				{
-					myId: 4,
-					label: datasetLabels[4],
-					backgroundColor: "#aaaaaa",
-					borderColor: 'rgba(75,150,75,0.7)',
+					myId: 1,
+					label: makeLabel(4),
+					backgroundColor: backgroundColor,
+					borderColor: colors[1] + "60", // 'rgba(75,150,75,0.7)',
 					borderWidth: 2,
 					fill: false,
-					hidden: this.isHidden[4],
+					hidden: this.isHidden[1],
 					data: deathsData
-				}
-			];
+				});
 		}
 
-		return {labels: labels, datasets: this.datasets};
+		return {labels: labels, datasets: datasets};
+	}
+
+	createChartData () { // 
+		var result = this.currentSeriesLocked() ? {datasets: []} : this.createChartDataOneTrack(this.props.series, this.props.label, 
+			(this.state.lockedSeries.length === 0) ? material500Colors[0] : ["#000000", "#888888"]);
+		for (var j = 0; j < this.state.lockedSeries.length; j += 1) {
+			var item = this.state.lockedSeries[j];
+			var r = this.createChartDataOneTrack(item.series, item.label, material500Colors[j], item.label === this.props.label);
+			result.datasets = result.datasets.concat(r.datasets);
+			result.labels = r.labels;
+		}
+		this.datasets = result.datasets;
+		return result;
 	}
 
 	handleLogChanged = () => {
@@ -189,9 +225,30 @@ class SeriesChart extends React.Component {
 		this.setState({movingAverageDays: 5, smooth: event.target.checked});
 	}
 
+	handleLockButton = (event) => {
+		if (this.state.lockedSeries.length >= lockMax) {
+			return;
+		}
+		for (var i = 0; i < this.state.lockedSeries.length; i += 1) {
+			var seriesInfo = this.state.lockedSeries[i];
+			if (seriesInfo.label === this.props.label) {
+				return;
+			}
+		}
+		this.state.lockedSeries.push({label: this.props.label, series: this.props.series});
+		this.setState({lockedSeries:this.state.lockedSeries});
+	}
+
+	handleResetLockButton = (event) => {
+		this.setState({lockedSeries: []});
+	}
+
+	handleCasesDeathsButton = (event) => {
+		this.setState({showCases: !this.state.showCases});
+	}
+
 	render() {
-		const chartData = this.props.series && this.createChartData(
-			this.props.series, this.state.cumulative, this.state.smooth);
+		const chartData = this.props.series && this.createChartData();
 
 	    const options = {
 			animation: {
@@ -254,7 +311,7 @@ class SeriesChart extends React.Component {
 					className="slider"
 					disabled={this.state.cumulative}
 					min={1}
-					max={5}
+					max={9}
 					step={2}
 					track="inverted"
 					defaultValue={1}
@@ -263,8 +320,21 @@ class SeriesChart extends React.Component {
 				{this.props.children}
 			</div>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
+			<div className={this.props.small ? "smallLockButton" : "bigLockButton"}>
+				<Button onClick={this.handleLockButton} disabled={this.currentSeriesLocked() || this.state.lockedSeries.length >= lockMax}>
+					Compare&nbsp;&nbsp;"{this.props.label.trim()}""
+				</Button>
+			</div>
+			<div className={this.props.small ? "smallLockControls" : "bigLockControls"}>
+				<Button onClick={this.handleCasesDeathsButton} disabled={this.state.lockedSeries.length === 0}>
+					Cases/Deaths
+				</Button>
+				<Button onClick={this.handleResetLockButton} disabled={this.state.lockedSeries.length === 0}>
+					Reset
+				</Button>
+			</div>
 		</div>)
 	}
-}	
+}
 
 export default SeriesChart;
