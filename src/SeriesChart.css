@@ -28,7 +28,7 @@
   left: 10px;
   display: grid;
   grid-template-columns: 70px 60px;
-  grid-template-rows: 19px 19px 19px 19px;
+  grid-template-rows: 23px 23px 23px 23px;
   grid-template-areas: 
     "label slider"
     "cumulative cumulative"

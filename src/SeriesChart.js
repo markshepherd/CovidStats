@@ -138,7 +138,7 @@ class SeriesChart extends React.Component {
 				myId: 1,
 				label: makeLabel(1),
 				backgroundColor: backgroundColor,
-				borderColor: makeColor(1, "80"), // 'rgba(75,150,75,0.5)',
+				borderColor: makeColor(1, "90"), // 'rgba(75,150,75,0.5)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[1],
@@ -194,7 +194,7 @@ class SeriesChart extends React.Component {
 				myId: 1,
 				label: makeLabel(4),
 				backgroundColor: backgroundColor,
-				borderColor: makeColor(1, "80"), // 'rgba(75,150,75,0.7)',
+				borderColor: makeColor(1, "90"), // 'rgba(75,150,75,0.7)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[1],
@@ -296,13 +296,13 @@ class SeriesChart extends React.Component {
 			legend: {position: this.props.small ? "bottom" : "top"},
 			title: {
 				display: this.props.title !== "",
-				text: (this.state.lockedSeries.length !== 0) ? "Comparing ..." : this.props.title,
+				text: (this.state.lockedSeries.length !== 0 && this.currentSeriesLocked()) ? "Comparing ..." : this.props.title,
 				fontSize: "16"},
 			layout: {
 				padding: {
 					left: 0,
 					right: 0,
-					top: 20,
+					top: 35,
 					bottom: 85
 				}
 			},
@@ -325,7 +325,7 @@ class SeriesChart extends React.Component {
 		};
 
 		const checkboxLabelPlacement = this.props.small ? "start" : undefined;
-		const checkboxSize = this.props.small ? "medium" : "small";
+		const checkboxSize = "medium"; // this.props.small ? "medium" : "small";
 
 		return (<div className="chartRoot">
 			<div className={this.props.small ? "smallChartControls" : "bigChartControls"}>

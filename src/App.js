@@ -359,10 +359,21 @@ class App extends React.Component {
 				? this.state.selectedState + "," + this.state.selectedCounty
 				: this.state.selectedState + ", " + this.state.selectedCounty + " County";
 
-		const chartLabel = this.state.selectedCounty
-			+ (this.state.selectedCounty === CovidData.allCounties ? "" : " County")
-			+ ", " + (this.state.selectedState === CovidData.allStates
-				? CovidData.allStates : Utils.stateAbbreviation(this.state.selectedState));
+		var chartLabel;
+		if (this.state.selectedState === CovidData.allStates) {
+			chartLabel = "USA";
+		} else {
+			if (this.state.selectedCounty === CovidData.allCounties) {
+				chartLabel = this.state.selectedState;
+			} else {
+				chartLabel = this.state.selectedCounty + " County, " + Utils.stateAbbreviation(this.state.selectedState);
+			}
+		}
+
+		// const chartLabel = this.state.selectedCounty
+		// 	+ (this.state.selectedCounty === CovidData.allCounties ? "" : " County")
+		// 	+ ", " + (this.state.selectedState === CovidData.allStates
+		// 		? CovidData.allStates : Utils.stateAbbreviation(this.state.selectedState));
 
 		if (this.state.statesData && this.state.selectedState) {
 			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
