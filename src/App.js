@@ -7,6 +7,8 @@ import preval from 'preval.macro'
 import AboutDialog from './AboutDialog';
 import Analytics from './Analytics';
 import CovidData from './CovidData';
+import GeneralData from './GeneralData';
+
 // import GestureHandler from './GestureHandler';
 import LoadingDialog from './LoadingDialog';
 import MyLink from './MyLink';
@@ -18,6 +20,8 @@ import Utils from './Utils';
 
 import { version } from './Version';
 import './App.css';
+
+// county populations https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
 
 const versionString = version.split(/\./)[0].toString();
 const development = window.location.toString().match(/(localhost|covid-test|192\.168)/)
@@ -81,7 +85,9 @@ class App extends React.Component {
 			startDate: "2020-03-01",
 			statesData: undefined,
 			statesList: undefined,
-			aboutTransparent: false
+			aboutTransparent: false,
+			generalData: undefined,
+			gotData: false
 		};
 	}
 
@@ -135,20 +141,24 @@ class App extends React.Component {
 	}
 
 	componentDidMount() {
-		const path = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv";
-		this.covidData = new CovidData(path, (statesData, latestDate) => {
+		const covidDataPath = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv";
+		this.covidData = new CovidData(covidDataPath, (statesData, latestDate) => {
 			var nationalTimeline =
 				statesData[CovidData.allStates].countiesData[CovidData.allCounties].timeline;
 			this.setState({
 				dateList: nationalTimeline.map((item) => item.date),
 				statesData: statesData,
 				statesList: this.calcStatesList(statesData),
-				latestDate: latestDate,
-				isLoading: false
+				latestDate: latestDate
 			});
 		});
 		this.mql.addListener(() => {
 			this.setState({small: this.mql.matches});
+		});
+
+		const generalDataPath = "co-est2019-alldata-trimmed.csv";
+		this.generalData = new GeneralData(generalDataPath, (generalData) => {
+			this.setState({generalData: generalData});
 		});
 	}
 
@@ -239,6 +249,27 @@ class App extends React.Component {
 
 	handleTitleClick = (e) => {
 		this.setState({aboutOpen: true})
+	}
+
+	componentDidUpdate(prevProps, prevState, snapshot) {
+		if (this.state.statesData && this.state.generalData && !this.state.gotData) {
+			this.setState({gotData: true, isLoading: false});
+			for (var state in this.state.generalData) {
+				var stateInfo = this.state.generalData[state];
+				for (var county in stateInfo) {
+					var countyInfo = stateInfo[county];
+					var stateData = this.state.statesData[state];
+					if (stateData) {
+						var countyData = stateData.countiesData[county];
+						if (countyData) {
+							for (var i in countyInfo) {
+								countyData[i] = countyInfo[i];
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// handleSwipeLeft = (e) => {
@@ -357,7 +388,7 @@ class App extends React.Component {
 						selection={this.state.selectedCounty} 
 						onSelected={this.handleCountySelected}/></div>}
 
-				{this.state.selectedCounty && this.state.statesData && <div className="chart">
+				{this.state.selectedCounty && this.state.statesData && this.state.gotData && <div className="chart">
 					<SeriesChart
 						params={this.params}
 						small={this.state.small}

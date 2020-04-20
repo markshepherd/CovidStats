@@ -32,7 +32,7 @@ export default class CovidData {
 	// Callback parameters are (statesData, latestDate)
 	constructor(filepath, callback) {
 		this.callback = callback;
-		this.readBigDataFile(filepath);
+		this.readDataFile(filepath);
 	}
 
 	/*private*/ addToSeries(series, item) {
@@ -61,7 +61,7 @@ export default class CovidData {
 	}
 
 	// csv columns are: date,county,state,fips,cases,deaths
-	/*private*/ receivedBigDataFile(csvText) {
+	/*private*/ receivedDataFile(csvText) {
 		var previousCases;
 		var previousDeaths;
 		var previousCounty;
@@ -145,14 +145,14 @@ export default class CovidData {
 		this.callback(statesData, latestDate);
 	}
 
-	/*private*/ readBigDataFile(filepath) {
+	/*private*/ readDataFile(filepath) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = () => {
 			if(xhr.readyState === XMLHttpRequest.DONE) {
 				var status = xhr.status;
 				if (status === 0 || (status >= 200 && status < 400)) {
 					// The request has been completed successfully
-					this.receivedBigDataFile(xhr.responseText);
+					this.receivedDataFile(xhr.responseText);
 				} else {
 					alert("Couldn't fetch data file: status", status);
 				}

@@ -14,11 +14,12 @@
   justify-items: end;  
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 23px 23px 23px;
+  grid-template-rows: 23px 23px 23px 23px;
   grid-template-areas: 
     "log"
     "smooth"
-    "cumulative";
+    "cumulative"
+    "per100000";
 }
 
 .bigChartControls {
@@ -27,11 +28,12 @@
   left: 10px;
   display: grid;
   grid-template-columns: 70px 60px;
-  grid-template-rows: 19px 19px 19px;
+  grid-template-rows: 19px 19px 19px 19px;
   grid-template-areas: 
     "label slider"
     "cumulative cumulative"
     "log log"
+    "per100000 per100000";
 }
 
 .bigCompareButton {
@@ -43,7 +45,7 @@
 .smallCompareButton {
   position: absolute;
   bottom: 40px;
-  right: 110px;
+  right: 115px;
 }
 
 .log {
@@ -67,6 +69,10 @@
 
 .cumulative {
   grid-area: cumulative;
+}
+
+.per100000{
+  grid-area: per100000;
 }
 
 .appTitle {

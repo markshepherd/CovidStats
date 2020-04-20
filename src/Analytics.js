@@ -36,15 +36,10 @@ class Analytics {
 		}
 	}
 
-	counts = {
-		hideshow_dataset_click: 0,
-		date_slider_click: 0,
-		linlog_click: 0,
-		arrow_click: 0
-	};
+	counts = {};
 
 	countableEvent(eventName) {
-		this.counts[eventName] += 1;
+		this.counts[eventName] = (this.counts[eventName] || 0) + 1;
 		if (this.counts[eventName] === 1) {
 			this.reportEvent(`${eventName}_1`)
 		} else if (this.counts[eventName] === 5) {

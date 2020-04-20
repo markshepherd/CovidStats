@@ -93,6 +93,7 @@ export default class Utils {
 		"colorado": "CO",
 		"connecticut": "CT",
 		"delaware": "DE",
+		"district of columbia": "DC",
 		"florida": "FL",
 		"georgia": "GA",
 		"hawaii": "HI",
@@ -135,12 +136,10 @@ export default class Utils {
 		"west virginia": "WV",
 		"wisconsin": "WI",
 		"wyoming": "WY",
-		"guam": "GU",
 		"puerto rico": "PR",
-		"virgin islands": "VI"
 	};
 
 	static stateAbbreviation(stateName) {
-		return Utils.stateAbbreviations[stateName.toLowerCase()];
+		return Utils.stateAbbreviations[stateName.toLowerCase()] || stateName.substring(0,2).toUpperCase();
 	}
 }

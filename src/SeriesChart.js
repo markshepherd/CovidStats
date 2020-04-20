@@ -33,12 +33,14 @@ class SeriesChart extends React.Component {
 			type: this.props.params.get("type") || "linear",
 			movingAverageDays: days,
 			cumulative: this.props.params.get("cumulative") === "true",
+			per100000: this.props.params.get("per100000") === "true",
 			smooth: days > 1,
 			lockedSeries: [],
 			showCases: true};
 		this.datasets = [];
 		URLUpdater.update("type", this.state.type, "linear");
 		URLUpdater.update("cumulative", this.state.cumulative, false);
+		URLUpdater.update("per100000", this.state.per100000, false);
 		URLUpdater.update("days", this.state.movingAverageDays, 1);
 		this.defaultSliderValue = this.state.movingAverageDays;
 	}
@@ -87,31 +89,45 @@ class SeriesChart extends React.Component {
 		var cumulativeDeathsData = [];
 		var trimmedSeries = Utils.trimToStartDate(this.props.startDate, series, this.props.dateList);
 
+		var populationDataMissing = false;
+		var seriesPopulation = series.population;
+		if (this.state.per100000 && !seriesPopulation) {
+			seriesPopulation = 100000;
+			//alert("Sorry, we have no population data for " + label);
+			populationDataMissing = true;
+		}
+		var factor = this.state.per100000 ? (100000 / seriesPopulation) : 1;
+
 		for (var i = 0; i < trimmedSeries.timeline.length; i += 1) {
 			var item = trimmedSeries.timeline[i];
+
 			labels.push(item.date.replace(/2020-/, ""));
-			casesData.push(item.cases);
-			deathsData.push(item.deaths);
-			cumulativeCasesData.push(item.cumulativeCases);
-			cumulativeDeathsData.push(item.cumulativeDeaths);
+			casesData.push(Math.round(item.cases * factor * 10) / 10);
+			deathsData.push(Math.round(item.deaths * factor * 10) / 10);
+			cumulativeCasesData.push(Math.round(item.cumulativeCases * factor * 10) / 10);
+			cumulativeDeathsData.push(Math.round(item.cumulativeDeaths * factor * 10) / 10);
 		}
 
+		const per = this.state.per100000 ? " per 100k" : "";
 		const datasetLabels = [
-			"Cumulative Cases", "Cumulative Deaths", "Daily Cases", 
-			`Cases ${this.state.movingAverageDays}-day Average `, "Daily Deaths",
-			`Deaths ${this.state.movingAverageDays}-day Average`];
+			`Cumulative cases${per}`, `Cumulative deaths${per}`, `Daily cases${per}`, 
+			`Cases${per} ${this.state.movingAverageDays}-day avg`, `Daily deaths${per}`,
+			`Deaths${per} ${this.state.movingAverageDays}-day avg`];
 
 		const showCases = (this.state.lockedSeries.length === 0) || this.state.showCases;
 		const showDeaths = (this.state.lockedSeries.length === 0) || !this.state.showCases;
 		const backgroundColor = highlight ? "#000000" : "#aaaaaa";
-		const makeLabel = (n) => datasetLabels[n] + ": " + (label ? (label + " ") : "");
+		const makeLabel = (n) => populationDataMissing
+			? "Population data not available."
+			: (datasetLabels[n] + ": " + (label || "??"));
+		const makeColor = (num, a) => populationDataMissing ? "#ff0000" : colors[num] + a;
 
 		if (this.state.cumulative) {
 			showCases && datasets.push({
 				myId: 0,
 				label: makeLabel(0),
 				backgroundColor: backgroundColor,
-				borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.5)',
+				borderColor: makeColor(0, "b0"), // 'rgba(75,75,192,0.5)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[0],
@@ -122,7 +138,7 @@ class SeriesChart extends React.Component {
 				myId: 1,
 				label: makeLabel(1),
 				backgroundColor: backgroundColor,
-				borderColor: colors[1] + "80", // 'rgba(75,150,75,0.5)',
+				borderColor: makeColor(1, "80"), // 'rgba(75,150,75,0.5)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[1],
@@ -134,7 +150,7 @@ class SeriesChart extends React.Component {
 				myId: 0,
 				label: makeLabel(3),
 				backgroundColor: backgroundColor,
-				borderColor: colors[0] + "50", // 'rgba(75,75,192,0.3)',
+				borderColor: makeColor(0, "50"), // 'rgba(75,75,192,0.3)',
 				borderWidth: 4,
 				fill: false,
 				hidden: this.isHidden[0],
@@ -146,7 +162,7 @@ class SeriesChart extends React.Component {
 				myId: 1,
 				label: makeLabel(5),
 				backgroundColor: backgroundColor,
-				borderColor: colors[1] + "50", // 'rgba(75,150,75,0.3)',
+				borderColor: makeColor(1, "50"), // 'rgba(75,150,75,0.3)',
 				borderWidth: 4,
 				fill: false,
 				hidden: this.isHidden[1],
@@ -167,7 +183,7 @@ class SeriesChart extends React.Component {
 				myId: 0,
 				label: makeLabel(2),
 				backgroundColor: backgroundColor,
-				borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.7)',
+				borderColor: makeColor(0, "b0"), // 'rgba(75,75,192,0.7)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[0],
@@ -178,7 +194,7 @@ class SeriesChart extends React.Component {
 				myId: 1,
 				label: makeLabel(4),
 				backgroundColor: backgroundColor,
-				borderColor: colors[1] + "80", // 'rgba(75,150,75,0.7)',
+				borderColor: makeColor(1, "80"), // 'rgba(75,150,75,0.7)',
 				borderWidth: 2,
 				fill: false,
 				hidden: this.isHidden[1],
@@ -215,6 +231,11 @@ class SeriesChart extends React.Component {
 	handleCumulativeChanged = (event) => {
 		this.setState({cumulative: event.target.checked});
 		URLUpdater.update("cumulative", event.target.checked, false);
+	}
+
+	handlePer100000Changed = (event) => {
+		this.setState({per100000: event.target.checked});
+		URLUpdater.update("per100000", event.target.checked, false);
 	}
 
 	handleChartClick = () => {
@@ -273,13 +294,16 @@ class SeriesChart extends React.Component {
 			aspectRatio: 1.5,
 			onClick: this.handleChartClick, // FYI there is also onResize, onComplete, onHover, before/afterUpdate
 			legend: {position: this.props.small ? "bottom" : "top"},
-			title: {display: this.props.title !== "", text: this.props.title, fontSize: "16"},
+			title: {
+				display: this.props.title !== "",
+				text: (this.state.lockedSeries.length !== 0) ? "Comparing ..." : this.props.title,
+				fontSize: "16"},
 			layout: {
 				padding: {
 					left: 0,
 					right: 0,
-					top: 0,
-					bottom: 65
+					top: 20,
+					bottom: 85
 				}
 			},
 			scales: {
@@ -307,6 +331,7 @@ class SeriesChart extends React.Component {
 			<div className={this.props.small ? "smallChartControls" : "bigChartControls"}>
 				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size={checkboxSize} color="default" checked={this.state.type === "logarithmic"}/>} label="Log" onChange={this.handleLogChanged}/>
 				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size={checkboxSize} color="default" checked={this.state.cumulative}/>} label="Cumulative" onChange={this.handleCumulativeChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="per100000" control={<Checkbox size={checkboxSize} color="default" checked={this.state.per100000}/>} label="Per 100k" onChange={this.handlePer100000Changed}/>
 
 				{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
 				{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
