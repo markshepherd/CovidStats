@@ -23,7 +23,7 @@
 
 .bigChartControls {
   position: absolute;
-  top: 5px;
+  top: 0px;
   left: 10px;
   display: grid;
   grid-template-columns: 70px 60px;
@@ -34,27 +34,15 @@
     "log log"
 }
 
-.bigLockButton {
+.bigCompareButton {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  bottom: 5px;
+  left: 10px;
 }
 
-.smallLockButton {
+.smallCompareButton {
   position: absolute;
   bottom: 40px;
-  right: 110px;
-}
-
-.bigLockControls {
-  position: absolute;
-  top: 20px;
-  right: 0px;
-}
-
-.smallLockControls {
-  position: absolute;
-  bottom: 20px;
   right: 110px;
 }
 
@@ -83,14 +71,14 @@
 
 .appTitle {
   position: absolute;
-  bottom: 5px;
-  left: 10px;
+  bottom: -5px;
+  left: 0px;
   text-align: left;
 }
 
 .updateDate {
   position: absolute;
-  bottom: 30px;
-  left: 10px;
+  bottom: 19px;
+  left: 0px;
   text-align: left;
 }

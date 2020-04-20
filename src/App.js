@@ -13,13 +13,14 @@ import MyLink from './MyLink';
 import RegionMenu from './RegionMenu';
 import RegionTable from './RegionTable';
 import SeriesChart from './SeriesChart';
+import URLUpdater from './URLUpdater';
 import Utils from './Utils';
 
 import { version } from './Version';
 import './App.css';
 
 const versionString = version.split(/\./)[0].toString();
-const development = window.location.toString().match(/(localhost|covid-test)/)
+const development = window.location.toString().match(/(localhost|covid-test|192\.168)/)
 Analytics.enable(!development);
 
 const MyTooltip = withStyles((theme) => ({
@@ -63,18 +64,24 @@ class App extends React.Component {
 		this.sliderRef = React.createRef();
 		this.stateMenuRef = React.createRef();
 		this.countyMenuRef = React.createRef();
+		this.aboutRef = React.createRef();
+
+		this.params = new URLSearchParams(window.location.search);
+		const selectedCounty = this.params.get("county") || CovidData.allCounties;
+		const selectedState = this.params.get("state") || CovidData.allStates;
 
 		this.state = {
 			aboutOpen: false,
 			dateList: undefined,
 			isLoading: true,
 			latestDate: undefined,
-			selectedCounty: CovidData.allCounties,
-			selectedState: CovidData.allStates,
+			selectedCounty: selectedCounty,
+			selectedState: selectedState,
 			small: this.mql.matches,
 			startDate: "2020-03-01",
 			statesData: undefined,
-			statesList: undefined
+			statesList: undefined,
+			aboutTransparent: false
 		};
 	}
 
@@ -146,19 +153,24 @@ class App extends React.Component {
 	}
 
 	handleStateSelected = (stateName) => {
-		this.setState({selectedState: stateName});
+		this.setState({selectedState: stateName, selectedCounty: CovidData.allCounties});
+		URLUpdater.update("state", stateName, CovidData.allStates);
+		URLUpdater.update("county", CovidData.allCounties, CovidData.allCounties);
 	}
 
 	handleCountySelected = (countyName) => {
 		this.setState({selectedCounty: countyName});
+		URLUpdater.update("county", countyName, CovidData.allCounties);
 	}
 
 	handleSliderChanged = (e, value) => {
 		this.setState({startDate: this.state.dateList[value]});
+		this.state.aboutOpen && this.setState({aboutTransparent: true});
 	}
 
 	handleSliderCommited = (e, value) => {
 		Analytics.dateSliderUsed();
+		this.state.aboutOpen && this.setState({aboutTransparent: false});
 	}
 
 	handleStateSelectChanged = (e) => {
@@ -314,10 +326,10 @@ class App extends React.Component {
 			? ""
 			: (this.state.selectedCounty === CovidData.allCounties) 
 				? this.state.selectedState + "," + this.state.selectedCounty
-				: this.state.selectedState + ", " + this.state.selectedCounty + " county";
+				: this.state.selectedState + ", " + this.state.selectedCounty + " County";
 
 		const chartLabel = this.state.selectedCounty
-			+ (this.state.selectedCounty === CovidData.allCounties ? "" : " county")
+			+ (this.state.selectedCounty === CovidData.allCounties ? "" : " County")
 			+ ", " + (this.state.selectedState === CovidData.allStates
 				? CovidData.allStates : Utils.stateAbbreviation(this.state.selectedState));
 
@@ -335,16 +347,19 @@ class App extends React.Component {
 
 				{!this.state.small && this.state.statesList && <div className="state">
 					<RegionTable extra="color1" title="State"
-						list={this.state.statesList} onSelected={this.handleStateSelected}/></div>}
+						list={this.state.statesList}
+						selection={this.state.selectedState} 
+						onSelected={this.handleStateSelected}/></div>}
 
 				{!this.state.small && this.state.statesData && this.state.selectedState && <div className="county">
 					<RegionTable extra="color2" title="County"
 						list={this.countiesList}
+						selection={this.state.selectedCounty} 
 						onSelected={this.handleCountySelected}/></div>}
-
 
 				{this.state.selectedCounty && this.state.statesData && <div className="chart">
 					<SeriesChart
+						params={this.params}
 						small={this.state.small}
 						appTitle="Covid-19 by US State/County"
 						onTitleClick={this.handleTitleClick}
@@ -356,11 +371,11 @@ class App extends React.Component {
 						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}>
 
 						{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
-							<RegionMenu ref={this.stateMenuRef} list={this.state.statesList} onSelected={this.handleStateSelected}/>
+							<RegionMenu selection={this.state.selectedState} ref={this.stateMenuRef} list={this.state.statesList} onSelected={this.handleStateSelected}/>
 						</div>}
 
 						{this.state.small && this.state.selectedCounty && this.state.statesData && <div className="countySelector">
-							<RegionMenu ref={this.countyMenuRef} list={this.countiesList} onSelected={this.handleCountySelected}/>
+							<RegionMenu selection={this.state.selectedCounty} ref={this.countyMenuRef} list={this.countiesList} onSelected={this.handleCountySelected}/>
 						</div>}
 					</SeriesChart>
 				</div>}
@@ -371,7 +386,7 @@ class App extends React.Component {
 
 				{this.state.isLoading && <LoadingDialog open={this.state.isLoading}/>}
 
-				{this.state.aboutOpen && <AboutDialog open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
+				{this.state.aboutOpen && <AboutDialog transparent={this.state.aboutTransparent} open={this.state.aboutOpen} onCloseButton={this.handleAboutCloseButton}>
 					<div className="notesContainer">
 					{aboutInfo}
 					</div>

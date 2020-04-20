@@ -5,6 +5,8 @@ import Analytics from './Analytics';
 import "./AboutDialog.css";
 
 export default class AboutDialog extends React.Component {
+	state = {backgroundColor: '#ffffffee'};
+
 	handleCloseButton = () =>{
 		this.props.onCloseButton();
 	}
@@ -20,7 +22,7 @@ export default class AboutDialog extends React.Component {
 			<Dialog onClose={this.handleCloseButton} open={this.noop(this.props.open)} aria-labelledby="customized-dialog-title"
 				PaperProps={{
     				style: {
-      					backgroundColor: '#ffffffee'
+      					backgroundColor: this.props.transparent ? "#ffffff44" : "#ffffffee"
     				}
   				}}>
 				<DialogTitle class="dialogTitle" disableTypography id="customized-dialog-title" onClose={this.handleCloseButton}>

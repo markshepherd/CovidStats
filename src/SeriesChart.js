@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Button, Checkbox, FormControlLabel, Link, Slider, Typography } from '@material-ui/core';
 import Analytics from './Analytics';
 import Utils from './Utils';
+import URLUpdater from './URLUpdater';
 import "./SeriesChart.css";
 
 // from https://material.io/resources/color/#!/?view.left=0&view.right=0
@@ -27,8 +28,19 @@ class SeriesChart extends React.Component {
 	constructor (props) {
 		super(props);
 		this.chartRef = React.createRef();
-		this.state = {type: "linear", movingAverageDays: 1, cumulative: false, smooth: false, lockedSeries: [], showCases: true};
+		var days = parseInt(this.props.params.get("days") || "1");
+		this.state = {
+			type: this.props.params.get("type") || "linear",
+			movingAverageDays: days,
+			cumulative: this.props.params.get("cumulative") === "true",
+			smooth: days > 1,
+			lockedSeries: [],
+			showCases: true};
 		this.datasets = [];
+		URLUpdater.update("type", this.state.type, "linear");
+		URLUpdater.update("cumulative", this.state.cumulative, false);
+		URLUpdater.update("days", this.state.movingAverageDays, 1);
+		this.defaultSliderValue = this.state.movingAverageDays;
 	}
 
 	calcMovingAverage(array, number) {
@@ -86,11 +98,8 @@ class SeriesChart extends React.Component {
 
 		const datasetLabels = [
 			"Cumulative Cases", "Cumulative Deaths", "Daily Cases", 
-			`Daily Cases ${this.state.movingAverageDays}-day Average`, "Daily Deaths",
-			`Daily Deaths ${this.state.movingAverageDays}-day Average`];
-
-		this.minY = undefined;
-		this.maxY = undefined;
+			`Cases ${this.state.movingAverageDays}-day Average `, "Daily Deaths",
+			`Deaths ${this.state.movingAverageDays}-day Average`];
 
 		const showCases = (this.state.lockedSeries.length === 0) || this.state.showCases;
 		const showDeaths = (this.state.lockedSeries.length === 0) || !this.state.showCases;
@@ -98,92 +107,92 @@ class SeriesChart extends React.Component {
 		const makeLabel = (n) => datasetLabels[n] + ": " + (label ? (label + " ") : "");
 
 		if (this.state.cumulative) {
-			showCases && datasets.push(
-				{
-					myId: 0,
-					label: makeLabel(0),
-					backgroundColor: backgroundColor,
-					borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.5)',
-					borderWidth: 2,
-					fill: false,
-					hidden: this.isHidden[0],
-					data: cumulativeCasesData
-				});
+			showCases && datasets.push({
+				myId: 0,
+				label: makeLabel(0),
+				backgroundColor: backgroundColor,
+				borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.5)',
+				borderWidth: 2,
+				fill: false,
+				hidden: this.isHidden[0],
+				data: cumulativeCasesData
+			});
 
-				showDeaths && datasets.push(
-				{
-					myId: 1,
-					label: makeLabel(1),
-					backgroundColor: backgroundColor,
-					borderColor: colors[1] + "60", // 'rgba(75,150,75,0.5)',
-					borderWidth: 2,
-					fill: false,
-					hidden: this.isHidden[1],
-					data: cumulativeDeathsData
-				});
+			showDeaths && datasets.push({
+				myId: 1,
+				label: makeLabel(1),
+				backgroundColor: backgroundColor,
+				borderColor: colors[1] + "80", // 'rgba(75,150,75,0.5)',
+				borderWidth: 2,
+				fill: false,
+				hidden: this.isHidden[1],
+				data: cumulativeDeathsData
+			});
 
 		} else if (this.state.smooth) {
-			showCases && datasets.push(
-				{
-					myId: 0,
-					label: makeLabel(3),
-					backgroundColor: backgroundColor,
-					borderColor: colors[0] + "50", // 'rgba(75,75,192,0.3)',
-					borderWidth: 4,
-					fill: false,
-					hidden: this.isHidden[0],
-					data: this.calcMovingAverage(casesData, this.state.movingAverageDays),
-					origData: casesData
-				});
+			showCases && datasets.push({
+				myId: 0,
+				label: makeLabel(3),
+				backgroundColor: backgroundColor,
+				borderColor: colors[0] + "50", // 'rgba(75,75,192,0.3)',
+				borderWidth: 4,
+				fill: false,
+				hidden: this.isHidden[0],
+				data: this.calcMovingAverage(casesData, this.state.movingAverageDays),
+				origData: casesData
+			});
 
-			showDeaths && datasets.push(
-				{
-					myId: 1,
-					label: makeLabel(4),
-					backgroundColor: backgroundColor,
-					borderColor: colors[1] + "50", // 'rgba(75,150,75,0.3)',
-					borderWidth: 4,
-					fill: false,
-					hidden: this.isHidden[1],
-					data: this.calcMovingAverage(deathsData, this.state.movingAverageDays),
-					origData: deathsData
-				});
+			showDeaths && datasets.push({
+				myId: 1,
+				label: makeLabel(5),
+				backgroundColor: backgroundColor,
+				borderColor: colors[1] + "50", // 'rgba(75,150,75,0.3)',
+				borderWidth: 4,
+				fill: false,
+				hidden: this.isHidden[1],
+				data: this.calcMovingAverage(deathsData, this.state.movingAverageDays),
+				origData: deathsData
+			});
 
-			if (!this.isHidden[3] && !this.isHidden[5]) {
-				this.minY = Math.min(Utils.findMin(casesData), Utils.findMin(deathsData));
-				this.maxY = Math.max(Utils.findMax(casesData), Utils.findMax(deathsData));
+			if (showCases && !this.isHidden[0]) {
+				this.minY = Math.max(this.minY === undefined ? Number.MAX_VALUE : this.minY, Utils.findMin(casesData));
+				this.maxY = Math.max(this.maxY === undefined ? Number.MIN_VALUE : this.maxY, Utils.findMax(casesData));
 			}
-
+			if (showDeaths && !this.isHidden[1]) {
+				this.minY = Math.max(this.minY === undefined ? Number.MAX_VALUE : this.minY, Utils.findMin(deathsData));
+				this.maxY = Math.max(this.maxY === undefined ? Number.MIN_VALUE : this.maxY, Utils.findMax(deathsData));
+			}
 		} else {
-			showCases && datasets.push(
-				{
-					myId: 0,
-					label: makeLabel(2),
-					backgroundColor: backgroundColor,
-					borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.7)',
-					borderWidth: 2,
-					fill: false,
-					hidden: this.isHidden[0],
-					data: casesData
-				});
+			showCases && datasets.push({
+				myId: 0,
+				label: makeLabel(2),
+				backgroundColor: backgroundColor,
+				borderColor: colors[0] + "b0", // 'rgba(75,75,192,0.7)',
+				borderWidth: 2,
+				fill: false,
+				hidden: this.isHidden[0],
+				data: casesData
+			});
 
-			showDeaths && datasets.push(
-				{
-					myId: 1,
-					label: makeLabel(4),
-					backgroundColor: backgroundColor,
-					borderColor: colors[1] + "60", // 'rgba(75,150,75,0.7)',
-					borderWidth: 2,
-					fill: false,
-					hidden: this.isHidden[1],
-					data: deathsData
-				});
+			showDeaths && datasets.push({
+				myId: 1,
+				label: makeLabel(4),
+				backgroundColor: backgroundColor,
+				borderColor: colors[1] + "80", // 'rgba(75,150,75,0.7)',
+				borderWidth: 2,
+				fill: false,
+				hidden: this.isHidden[1],
+				data: deathsData
+			});
 		}
 
 		return {labels: labels, datasets: datasets};
 	}
 
-	createChartData () { // 
+	createChartData () {
+		this.minY = undefined;
+		this.maxY = undefined;
+
 		var result = this.currentSeriesLocked() ? {datasets: []} : this.createChartDataOneTrack(this.props.series, this.props.label, 
 			(this.state.lockedSeries.length === 0) ? material500Colors[0] : ["#000000", "#888888"]);
 		for (var j = 0; j < this.state.lockedSeries.length; j += 1) {
@@ -198,11 +207,14 @@ class SeriesChart extends React.Component {
 
 	handleLogChanged = () => {
 		Analytics.linearLogToggleClicked();
-		this.setState({type: (this.state.type === "logarithmic") ? "linear" : "logarithmic"});
+		var newType = (this.state.type === "logarithmic") ? "linear" : "logarithmic";
+		this.setState({type: newType});
+		URLUpdater.update("type", newType, "linear");
 	}
 
 	handleCumulativeChanged = (event) => {
 		this.setState({cumulative: event.target.checked});
+		URLUpdater.update("cumulative", event.target.checked, false);
 	}
 
 	handleChartClick = () => {
@@ -219,13 +231,15 @@ class SeriesChart extends React.Component {
 
 	handleSliderChanged = (e, value) => {
 		this.setState({movingAverageDays: value, smooth: value !== 1});
+		URLUpdater.update("days", value, 1);
 	}
 
 	handleSmoothChanged = (event) => {
 		this.setState({movingAverageDays: 5, smooth: event.target.checked});
+		URLUpdater.update("days", 1, 1);
 	}
 
-	handleLockButton = (event) => {
+	handleCompareButton = (event) => {
 		if (this.state.lockedSeries.length >= lockMax) {
 			return;
 		}
@@ -239,7 +253,7 @@ class SeriesChart extends React.Component {
 		this.setState({lockedSeries:this.state.lockedSeries});
 	}
 
-	handleResetLockButton = (event) => {
+	handleResetCompareButton = (event) => {
 		this.setState({lockedSeries: []});
 	}
 
@@ -260,14 +274,14 @@ class SeriesChart extends React.Component {
 			onClick: this.handleChartClick, // FYI there is also onResize, onComplete, onHover, before/afterUpdate
 			legend: {position: this.props.small ? "bottom" : "top"},
 			title: {display: this.props.title !== "", text: this.props.title, fontSize: "16"},
-			layout: this.props.small ? {
+			layout: {
 				padding: {
 					left: 0,
 					right: 0,
 					top: 0,
 					bottom: 65
 				}
-			} : undefined,
+			},
 			scales: {
 				xAxes: [{
 					display: true
@@ -291,8 +305,8 @@ class SeriesChart extends React.Component {
 
 		return (<div className="chartRoot">
 			<div className={this.props.small ? "smallChartControls" : "bigChartControls"}>
-				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size={checkboxSize} color="default"/>} value={this.state.type === "logarithmic"} label="Log" onChange={this.handleLogChanged}/>
-				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size={checkboxSize} color="default"/>} value={this.state.cumulative} label="Cumulative" onChange={this.handleCumulativeChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="log" control={<Checkbox size={checkboxSize} color="default" checked={this.state.type === "logarithmic"}/>} label="Log" onChange={this.handleLogChanged}/>
+				<FormControlLabel labelPlacement={checkboxLabelPlacement} className="cumulative" control={<Checkbox size={checkboxSize} color="default" checked={this.state.cumulative}/>} label="Cumulative" onChange={this.handleCumulativeChanged}/>
 
 				{this.props.small && <Link className="appTitle" onClick={this.props.onTitleClick}><Typography variant="h6">{this.props.appTitle}</Typography></Link>}
 				{this.props.small && <Typography variant="subtitle2" className="updateDate">Updated {this.props.updateDate}</Typography>}
@@ -314,22 +328,22 @@ class SeriesChart extends React.Component {
 					max={9}
 					step={2}
 					track="inverted"
-					defaultValue={1}
+					defaultValue={this.defaultSliderValue}
 					onChange={this.handleSliderChanged}
 				/>}
 				{this.props.children}
 			</div>
 			{this.props.series && <Line ref={this.chartRef} options={options} data={chartData}/>}
-			<div className={this.props.small ? "smallLockButton" : "bigLockButton"}>
-				<Button onClick={this.handleLockButton} disabled={this.currentSeriesLocked() || this.state.lockedSeries.length >= lockMax}>
+			<div className={this.props.small ? "smallCompareButton" : "bigCompareButton"}>
+				<Button size="small" variant="outlined" onClick={this.handleCompareButton} disabled={this.currentSeriesLocked() || this.state.lockedSeries.length >= lockMax}>
 					Compare&nbsp;&nbsp;"{this.props.label.trim()}""
 				</Button>
-			</div>
-			<div className={this.props.small ? "smallLockControls" : "bigLockControls"}>
-				<Button onClick={this.handleCasesDeathsButton} disabled={this.state.lockedSeries.length === 0}>
+				&nbsp;
+				<Button size="small" variant="outlined" onClick={this.handleCasesDeathsButton} disabled={this.state.lockedSeries.length === 0}>
 					Cases/Deaths
 				</Button>
-				<Button onClick={this.handleResetLockButton} disabled={this.state.lockedSeries.length === 0}>
+				&nbsp;
+				<Button size="small" variant="outlined" onClick={this.handleResetCompareButton} disabled={this.state.lockedSeries.length === 0}>
 					Reset
 				</Button>
 			</div>

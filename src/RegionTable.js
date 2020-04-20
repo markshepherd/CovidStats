@@ -9,6 +9,7 @@ import {
 	TableContainer
 } from '@material-ui/core';
 import Analytics from './Analytics';
+import Utils from './Utils';
 import './RegionTable.css';
 
 const slimStyle = {height: "0px", padding: "0px"};
@@ -16,7 +17,10 @@ const slimStyle = {height: "0px", padding: "0px"};
 export default class RegionTable extends React.Component {
 	constructor(props) {
 		super(props);
-		this.selectedIndex = 0;
+		this.selectedIndex = Utils.findIndex(this.props.list, this.props.selection);
+		if (this.selectedIndex < 0) {
+			this.selectedIndex = 0;
+		}
 		this.state = {
 			selection: this.props.list[this.selectedIndex].name,
 			list: this.createSortedList("cases", false), 
@@ -126,7 +130,15 @@ export default class RegionTable extends React.Component {
 	}
 
 	listsEqual(a, b) {
-		return (a.length === b.length) && (a.length === 0 || (a[0].name === b[0].name));
+		if (a.length !== b.length) {
+			return false;
+		}
+		for (var i = 0; i < a.length; i += 1) {
+			if (a[i].name !== b[i].name || a[i].cases !== b[i].cases) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
