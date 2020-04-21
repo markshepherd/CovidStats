@@ -318,6 +318,7 @@ class SeriesChart extends React.Component {
 
 	handleResetCompareButton = (event) => {
 		this.setState({lockedSeries: []});
+		URLUpdater.update("lockedSeries", "", "");		
 	}
 
 	handleCasesDeathsButton = (event) => {
