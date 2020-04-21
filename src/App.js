@@ -253,14 +253,16 @@ class App extends React.Component {
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		if (this.state.statesData && this.state.generalData && !this.state.gotData) {
+			var stateName, stateData, countyName, countyData;
+
 			this.setState({gotData: true, isLoading: false});
-			for (var state in this.state.generalData) {
-				var stateInfo = this.state.generalData[state];
-				for (var county in stateInfo) {
-					var countyInfo = stateInfo[county];
-					var stateData = this.state.statesData[state];
+			for (stateName in this.state.generalData) {
+				var stateInfo = this.state.generalData[stateName];
+				for (countyName in stateInfo) {
+					var countyInfo = stateInfo[countyName];
+					stateData = this.state.statesData[stateName];
 					if (stateData) {
-						var countyData = stateData.countiesData[county];
+						countyData = stateData.countiesData[countyName];
 						if (countyData) {
 							for (var i in countyInfo) {
 								countyData[i] = countyInfo[i];
@@ -269,6 +271,18 @@ class App extends React.Component {
 					}
 				}
 			}
+
+			// var regionsMissingData = [];
+			// for (stateName in this.state.statesData) {
+			// 	stateData = this.state.statesData[stateName];
+			// 	for (countyName in stateData.countiesData) {
+			// 		countyData = stateData.countiesData[countyName];
+			// 		if (countyData.population === undefined) {
+			// 			regionsMissingData.push([stateName, countyName]);
+			// 		}
+			// 	}
+			// }
+			// console.log("regionsMissingData", JSON.stringify(regionsMissingData, undefined, 2));
 		}
 	}
 
