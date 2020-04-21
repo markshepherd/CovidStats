@@ -27,22 +27,55 @@ const lockMax = 11;
 class SeriesChart extends React.Component {
 	constructor (props) {
 		super(props);
-		this.chartRef = React.createRef();
 		var days = parseInt(this.props.params.get("days") || "1");
+		var lockedSeries = this.props.params.get("lockedSeries"); // "lockedSeries=state1,county1,state2,county2,..."
+		lockedSeries = lockedSeries ? this.stringToLockedSeries(lockedSeries) : [];
+
 		this.state = {
 			type: this.props.params.get("type") || "linear",
 			movingAverageDays: days,
 			cumulative: this.props.params.get("cumulative") === "true",
 			per100000: this.props.params.get("per100000") === "true",
 			smooth: days > 1,
-			lockedSeries: [],
+			lockedSeries: lockedSeries,
 			showCases: true};
+
+		this.chartRef = React.createRef();
 		this.datasets = [];
+		this.defaultSliderValue = this.state.movingAverageDays;
+
 		URLUpdater.update("type", this.state.type, "linear");
 		URLUpdater.update("cumulative", this.state.cumulative, false);
 		URLUpdater.update("per100000", this.state.per100000, false);
 		URLUpdater.update("days", this.state.movingAverageDays, 1);
-		this.defaultSliderValue = this.state.movingAverageDays;
+		URLUpdater.update("lockedSeries", this.lockedSeriesAsString(), "");
+	}
+
+	lockedSeriesAsString() {
+		if (!this.state.lockedSeries) return "";
+
+		var result = "";
+		var sep = "";
+		for (var i = 0; i < this.state.lockedSeries.length; i += 1) {
+			var item = this.state.lockedSeries[i];
+			result += `${sep}${item.state},${item.county}`;
+			sep = ",";
+		}
+
+		return result;
+	}
+
+	stringToLockedSeries(string) {
+		var tokens = string.split(/,/);
+		var result = [];
+		for (var i = 0; i < tokens.length; i += 2) {
+			var state = tokens[i];
+			var county = tokens[i + 1];
+			var seriesAndLabel = this.props.onFindSeries(state, county);
+			var item = {state: state, county: county, label: seriesAndLabel.label, series: seriesAndLabel.series};
+			result.push(item);
+		}
+		return result;
 	}
 
 	calcMovingAverage(array, number) {
@@ -97,15 +130,22 @@ class SeriesChart extends React.Component {
 			populationDataMissing = true;
 		}
 		var factor = this.state.per100000 ? (100000 / seriesPopulation) : 1;
+		const fixupNumber = (number) => {
+			var result = Math.max(0, Math.round(number * factor * 10) / 10);
+			if (result < 0) {
+				console.log("sdfadf");
+			}
+			return result;
+		};
 
 		for (var i = 0; i < trimmedSeries.timeline.length; i += 1) {
 			var item = trimmedSeries.timeline[i];
 
 			labels.push(item.date.replace(/2020-/, ""));
-			casesData.push(Math.round(item.cases * factor * 10) / 10);
-			deathsData.push(Math.round(item.deaths * factor * 10) / 10);
-			cumulativeCasesData.push(Math.round(item.cumulativeCases * factor * 10) / 10);
-			cumulativeDeathsData.push(Math.round(item.cumulativeDeaths * factor * 10) / 10);
+			casesData.push(fixupNumber(item.cases));
+			deathsData.push(fixupNumber(item.deaths));
+			cumulativeCasesData.push(fixupNumber(item.cumulativeCases));
+			cumulativeDeathsData.push(fixupNumber(item.cumulativeDeaths));
 		}
 
 		const per = this.state.per100000 ? " per 100k" : "";
@@ -270,8 +310,10 @@ class SeriesChart extends React.Component {
 				return;
 			}
 		}
-		this.state.lockedSeries.push({label: this.props.label, series: this.props.series});
-		this.setState({lockedSeries:this.state.lockedSeries});
+		this.state.lockedSeries.push({label: this.props.label, series: this.props.series,
+			state: this.props.state, county: this.props.county});
+		this.setState({lockedSeries: this.state.lockedSeries});
+		URLUpdater.update("lockedSeries", this.lockedSeriesAsString(), "");		
 	}
 
 	handleResetCompareButton = (event) => {

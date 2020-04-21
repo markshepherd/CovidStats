@@ -140,6 +140,36 @@ class App extends React.Component {
 		return result;
 	}
 
+	findSelectedCountyIndex() {
+		for (var i = 0; i < this.countiesList.length; i += 1) {
+			if (this.countiesList[i].name === this.state.selectedCounty) {
+				return i;
+			}
+ 		}
+	}
+	
+	findSelectedStateIndex() {
+		for (var i = 0; i < this.state.statesList.length; i += 1) {
+			if (this.state.statesList[i].name === this.state.selectedState) {
+				return i;
+			}
+ 		}
+	}
+
+	calcChartLabel(state, county) {
+		var result;
+		if (state === CovidData.allStates) {
+			result = "USA";
+		} else {
+			if (county === CovidData.allCounties) {
+				result = state;
+			} else {
+				result = county + " County, " + Utils.stateAbbreviation(state);
+			}
+		}
+		return result;
+	}
+
 	componentDidMount() {
 		const covidDataPath = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv";
 		this.covidData = new CovidData(covidDataPath, (statesData, latestDate) => {
@@ -191,22 +221,6 @@ class App extends React.Component {
 		this.handleCountySelected(e.currentTarget.textContent);
 	}
 
-	findSelectedCountyIndex() {
-		for (var i = 0; i < this.countiesList.length; i += 1) {
-			if (this.countiesList[i].name === this.state.selectedCounty) {
-				return i;
-			}
- 		}
-	}
-	
-	findSelectedStateIndex() {
-		for (var i = 0; i < this.state.statesList.length; i += 1) {
-			if (this.state.statesList[i].name === this.state.selectedState) {
-				return i;
-			}
- 		}
-	}
-
 	handleCountyDownClick = (e) => {
 		let index = this.findSelectedCountyIndex();
 		if (index < this.countiesList.length - 1) {
@@ -249,6 +263,13 @@ class App extends React.Component {
 
 	handleTitleClick = (e) => {
 		this.setState({aboutOpen: true})
+	}
+
+	handleFindSeries = (state, county) => {
+		return {
+			label: this.calcChartLabel(state, county),
+			series: this.state.statesData[state].countiesData[county]
+		};
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
@@ -373,22 +394,6 @@ class App extends React.Component {
 				? this.state.selectedState + "," + this.state.selectedCounty
 				: this.state.selectedState + ", " + this.state.selectedCounty + " County";
 
-		var chartLabel;
-		if (this.state.selectedState === CovidData.allStates) {
-			chartLabel = "USA";
-		} else {
-			if (this.state.selectedCounty === CovidData.allCounties) {
-				chartLabel = this.state.selectedState;
-			} else {
-				chartLabel = this.state.selectedCounty + " County, " + Utils.stateAbbreviation(this.state.selectedState);
-			}
-		}
-
-		// const chartLabel = this.state.selectedCounty
-		// 	+ (this.state.selectedCounty === CovidData.allCounties ? "" : " County")
-		// 	+ ", " + (this.state.selectedState === CovidData.allStates
-		// 		? CovidData.allStates : Utils.stateAbbreviation(this.state.selectedState));
-
 		if (this.state.statesData && this.state.selectedState) {
 			this.countiesList = this.calcCountiesList(this.state.statesData, this.state.selectedState);
 		}
@@ -419,11 +424,14 @@ class App extends React.Component {
 						small={this.state.small}
 						appTitle="Covid-19 by US State/County"
 						onTitleClick={this.handleTitleClick}
+						onFindSeries={this.handleFindSeries}
 						updateDate={this.state.latestDate}
 						title={chartTitle}
 						startDate={this.state.startDate}
 						dateList={this.state.dateList}
-						label={chartLabel}
+						label={this.calcChartLabel(this.state.selectedState, this.state.selectedCounty)}
+						state={this.state.selectedState}
+						county={this.state.selectedCounty}
 						series={this.state.statesData[this.state.selectedState].countiesData[this.state.selectedCounty]}>
 
 						{this.state.small && this.state.selectedState && this.state.statesData && <div className="stateSelector">
