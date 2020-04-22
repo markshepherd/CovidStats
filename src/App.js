@@ -18,12 +18,11 @@ import SeriesChart from './SeriesChart';
 import URLUpdater from './URLUpdater';
 import Utils from './Utils';
 
-import { version } from './Version';
+import { hash } from './Hash';
 import './App.css';
 
 // county populations https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html
 
-const versionString = version.split(/\./)[0].toString();
 const development = window.location.toString().match(/(localhost|covid-test|192\.168)/)
 Analytics.enable(!development);
 
@@ -307,6 +306,16 @@ class App extends React.Component {
 		}
 	}
 
+	calcBuildDate() {
+		const buildDate = preval`module.exports = new Date();`;
+		const dateOptions = {
+			year: 'numeric', month: 'numeric', day: 'numeric',
+			hour: 'numeric', minute: 'numeric',
+			hour12: false
+		};
+		return new Intl.DateTimeFormat('en-US', dateOptions).format(new Date(buildDate)).replace(/,/, "");		
+	}
+
 	// handleSwipeLeft = (e) => {
 	// 	this.countyMenuRef.current.handleDownClick();
 	// }
@@ -324,8 +333,6 @@ class App extends React.Component {
 	// }
 
 	render() {
-		const buildDate = preval`module.exports = new Date().toLocaleString();`;
-
 		const aboutInfo = <React.Fragment>
 			{this.state.dateList && 
 				<div className="dateControl">
@@ -383,7 +390,7 @@ class App extends React.Component {
 				  		src="email-seeklogo.svg"/>
 				</MyLink>
                 <Typography variant="caption">
-					{development ? "DEV" : "PROD"} {versionString}, {buildDate}
+					{development ? "DEV" : "PROD"} {hash} {this.calcBuildDate()}
 				</Typography>
 			</div>
 		</React.Fragment>;

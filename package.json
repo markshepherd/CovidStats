@@ -19,8 +19,8 @@
     "typeface-roboto": "0.0.75"
   },
   "scripts": {
-    "start": "genversion -e -s src/Version.js && react-scripts start",
-    "build": "genversion -e -s src/Version.js && react-scripts build",
+    "start": "./getHash && react-scripts start",
+    "build": "./getHash && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -39,8 +39,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": ".",
-  "devDependencies": {
-    "genversion": "^2.2.0"
-  }
+  "homepage": "."
 }
