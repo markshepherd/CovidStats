@@ -271,11 +271,13 @@ class SeriesChart extends React.Component {
 	handleCumulativeChanged = (event) => {
 		this.setState({cumulative: event.target.checked});
 		URLUpdater.update("cumulative", event.target.checked, false);
+		Analytics.cumulativeClicked();
 	}
 
 	handlePer100000Changed = (event) => {
 		this.setState({per100000: event.target.checked});
 		URLUpdater.update("per100000", event.target.checked, false);
+		Analytics.per100kClicked();		
 	}
 
 	handleChartClick = () => {
@@ -293,11 +295,17 @@ class SeriesChart extends React.Component {
 	handleSliderChanged = (e, value) => {
 		this.setState({movingAverageDays: value, smooth: value !== 1});
 		URLUpdater.update("days", value, 1);
+		Analytics.smoothClicked();
+	}
+
+	handleSliderCommited = (e) => {
+		Analytics.smoothSliderUsed();
 	}
 
 	handleSmoothChanged = (event) => {
 		this.setState({movingAverageDays: 5, smooth: event.target.checked});
 		URLUpdater.update("days", 1, 1);
+		Analytics.smoothClicked();
 	}
 
 	handleCompareButton = (event) => {
@@ -313,16 +321,19 @@ class SeriesChart extends React.Component {
 		this.state.lockedSeries.push({label: this.props.label, series: this.props.series,
 			state: this.props.state, county: this.props.county});
 		this.setState({lockedSeries: this.state.lockedSeries});
-		URLUpdater.update("lockedSeries", this.lockedSeriesAsString(), "");		
+		URLUpdater.update("lockedSeries", this.lockedSeriesAsString(), "");
+		Analytics.compareClicked();			
 	}
 
 	handleResetCompareButton = (event) => {
 		this.setState({lockedSeries: []});
 		URLUpdater.update("lockedSeries", "", "");		
+		Analytics.resetClicked();
 	}
 
 	handleCasesDeathsButton = (event) => {
 		this.setState({showCases: !this.state.showCases});
+		Analytics.casesDeathsClicked();
 	}
 
 	render() {
@@ -398,6 +409,7 @@ class SeriesChart extends React.Component {
 					track="inverted"
 					defaultValue={this.defaultSliderValue}
 					onChange={this.handleSliderChanged}
+					onChangeCommitted={this.handleSliderCommited}
 				/>}
 				{this.props.children}
 			</div>

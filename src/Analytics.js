@@ -63,12 +63,40 @@ class Analytics {
 		this.countableEvent("arrow_click");
 	}
 
+	smoothClicked() {
+		this.countableEvent("smooth_click");
+	}
+
+	cumulativeClicked() {
+		this.countableEvent("cumulative_click");
+	}
+
+	per100kClicked() {
+		this.countableEvent("per100k_click");
+	}
+
+	smoothSliderUsed() {
+		this.countableEvent("smooth_slider");
+	}
+
 	menuSelection() {
 		this.countableEvent("menu_selection");
 	}
 
 	aboutDialogOpened() {
 		this.countableEvent("about_dialog");
+	}
+
+	compareClicked() {
+		this.countableEvent("compare_click");
+	}
+
+	casesDeathsClicked() {
+		this.countableEvent("casesDeaths_click");
+	}
+
+	resetClicked() {
+		this.countableEvent("reset_click");
 	}
 
 	static instance;
