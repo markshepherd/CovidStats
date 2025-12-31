@@ -12,10 +12,10 @@
     "preval.macro": "^5.0.0",
     "react": "^16.13.1",
     "react-chartjs-2": "^2.9.0",
-    "react-devtools": "^4.6.0",
+    "react-devtools": "^4.28.5",
     "react-dom": "^16.13.1",
     "react-loader-spinner": "^3.1.14",
-    "react-scripts": "3.4.1",
+    "react-scripts": "5.0.1",
     "typeface-roboto": "0.0.75"
   },
   "scripts": {
